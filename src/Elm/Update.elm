@@ -2,15 +2,25 @@ module Update exposing (..)
 
 import Model exposing (..)
 import Auth.Update as Auth exposing (..)
+import RoomCreate.Update as RoomCreate exposing (..)
 
-update : Msg -> Model -> (Model, Cmd Msg)
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         AuthMsg msg ->
             let
-                (authModel, cmd) =
-                    Auth.update msg model.authModel
+                ( auth, cmd ) =
+                    Auth.update msg model.auth
             in
-                ({ model | authModel = authModel }, Cmd.map AuthMsg cmd)
+                ( { model | auth = auth }, Cmd.map AuthMsg cmd )
+
+        RoomCreateMsg msg ->
+            let
+                ( roomCreate, cmd ) =
+                    RoomCreate.update msg model.roomCreate
+            in
+                ( { model | roomCreate = roomCreate }, Cmd.map RoomCreateMsg cmd )
+
         _ ->
             model ! []

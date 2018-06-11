@@ -18,6 +18,6 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    [ Auth.subscriptions model.authModel |> Sub.map AuthMsg
+    [ Auth.subscriptions model.auth |> Sub.map AuthMsg
     ]
     |> Sub.batch

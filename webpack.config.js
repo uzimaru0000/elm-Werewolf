@@ -1,6 +1,5 @@
 'use strict'
 
-const Dotenv = require('dotenv-webpack');
 const webpack = require('webpack');
 require('dotenv').config();
 

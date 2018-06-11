@@ -45,4 +45,5 @@ app.ports.logout.subscribe(_ => {
     if (auth.currentUser) auth.signOut().then(x => app.ports.logoutSuccess.send(null));
 });
 
+
 // bulma triggers

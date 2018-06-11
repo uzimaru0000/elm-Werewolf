@@ -8,9 +8,8 @@ import Html.Events exposing (..)
 
 view : Model -> Html Msg
 view model =
-    Html.header
+    nav
         [ class "navbar is-dark is-fixed-top"
-        , style [ ("padding", "8px") ]
         ]
         [ div [ class "navbar-brand" ]
             [ div [ class "navbar-item" ] [ text "WereWolf Online" ] ]
