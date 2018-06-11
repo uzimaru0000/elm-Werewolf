@@ -2,8 +2,13 @@ module Model exposing (..)
 
 import User exposing (..)
 
+type alias State =
+    { auth : Bool
+    }
+
 type alias Model = 
     { user : Maybe User
+    , state : State
     }
 
 
@@ -13,8 +18,9 @@ type Msg
     | Logout
     | LoginSuccess User
     | LogoutSuccess ()
+    | AuthStateCheck ()
 
 
 init : Model
 init =
-    Model Nothing
+    Model Nothing (State False)

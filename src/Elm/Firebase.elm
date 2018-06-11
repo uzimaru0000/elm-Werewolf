@@ -7,3 +7,4 @@ port logout : () -> Cmd msg
 
 port loginSuccess : (User -> msg) -> Sub msg
 port logoutSuccess : (() -> msg) -> Sub msg
+port authStateCheck : (() -> msg) -> Sub msg

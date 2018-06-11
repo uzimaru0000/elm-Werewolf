@@ -8,7 +8,6 @@ update msg model =
     case msg of
         Login ->
             model ! [ login () ]
-                |> Debug.log "login request"
         Logout ->
             model ! [ logout () ]
         LoginSuccess user ->
@@ -16,5 +15,11 @@ update msg model =
                 |> Debug.log "login success"
         LogoutSuccess _ ->
             { model | user = Nothing } ! []
+        AuthStateCheck _ ->
+            let
+                currentState = model.state
+                newState = { currentState | auth = True }
+            in
+                { model | state = newState } ! []
         _ -> 
             model ! []

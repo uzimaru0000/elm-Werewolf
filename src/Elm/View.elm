@@ -24,15 +24,15 @@ header model =
         [ div [ class "navbar-brand" ]
             [ div [ class "navbar-item" ] [ text "WereWolf Online" ] ]
         , div [ class "navbar-menu" ]
-            [ navbarEnd model.user
+            [ navbarEnd model
             ]
         ]
 
 
-navbarEnd : Maybe User -> Html Msg
-navbarEnd maybeUser =
+navbarEnd : Model -> Html Msg
+navbarEnd { user, state } =
     div [ class "navbar-end" ]
-        [ case maybeUser of
+        [ case user of
             Just user ->
                 div [ id "user-info"
                     , class "navbar-item has-dropdown is-hoverable"
@@ -60,6 +60,7 @@ navbarEnd maybeUser =
                     [ div
                         [ onClick Login
                         , class "button is-info"
+                        , classList [ ("is-loading", not state.auth) ]
                         ]
                         [ text "login" ]
                     ]

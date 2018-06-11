@@ -20,5 +20,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     [ loginSuccess LoginSuccess
     , logoutSuccess LogoutSuccess
+    , authStateCheck AuthStateCheck
     ]
     |> Sub.batch

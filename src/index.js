@@ -22,6 +22,7 @@ const provider = new firebase.auth.TwitterAuthProvider();
 auth.languageCode = 'jp';
 auth.getRedirectResult();
 auth.onAuthStateChanged(user => {
+    app.ports.authStateCheck.send(null);
     if (user) {
         const userData = {
             uid : user.uid,
