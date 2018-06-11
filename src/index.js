@@ -8,12 +8,12 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/database';
 firebase.initializeApp({
-    apiKey: "AIzaSyCIMfO_EchlKsapvKbW77dO6DQiubB9xls",
-    authDomain: "fir-tutorial-1c471.firebaseapp.com",
-    databaseURL: "https://fir-tutorial-1c471.firebaseio.com",
-    projectId: "fir-tutorial-1c471",
-    storageBucket: "fir-tutorial-1c471.appspot.com",
-    messagingSenderId: "480413349629"
+    apiKey: API_KEY,
+    authDomain: AUTH_DOMAIN,
+    databaseURL: DATABASE_URL,
+    projectId: PROJECT_ID,
+    storageBucket: STORAGE_BUCKET,
+    messagingSenderId: MESSAGING_SENDER_ID
 });
 
 const auth = firebase.auth();
