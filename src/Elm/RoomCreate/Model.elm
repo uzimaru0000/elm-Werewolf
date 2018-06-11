@@ -14,6 +14,7 @@ type Msg
     = InputName String
     | InputNum String
     | InputPass String
+    | Activate
     | Exit
     | Create
 
@@ -23,6 +24,6 @@ init =
     { roomName = Nothing
     , maxNum = 5
     , pass = Nothing
-    , isActive = True
+    , isActive = False
     , isInputError = False
     }

@@ -32,6 +32,9 @@ update msg model =
             }
                 ! []
 
+        Activate ->
+            { model | isActive = True } ! []
+
         Exit ->
             { model | isActive = False } ! []
 
