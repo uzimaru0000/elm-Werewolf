@@ -1,5 +1,8 @@
 'use strict'
 
+const Dotenv = require('dotenv-webpack');
+const webpack = require('webpack');
+
 module.exports = {
     entry: {
         app: './src/index.js'
