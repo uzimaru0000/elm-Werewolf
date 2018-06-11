@@ -30,6 +30,7 @@ auth.onAuthStateChanged(user => {
             iconUrl : user.photoURL
         };
         app.ports.loginSuccess.send(userData);
+        db.ref(`users/${user.uid}`).set({ name : userData.name, iconUrl : userData.iconUrl });
     }
 });
 
