@@ -1,25 +1,16 @@
 module Update exposing (..)
 
 import Model exposing (..)
-import Firebase exposing (..)
+import Auth.Update as Auth exposing (..)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        Login ->
-            model ! [ login () ]
-        Logout ->
-            model ! [ logout () ]
-        LoginSuccess user ->
-            { model | user = Just user } ! []
-                |> Debug.log "login success"
-        LogoutSuccess _ ->
-            { model | user = Nothing } ! []
-        AuthStateCheck _ ->
+        AuthMsg msg ->
             let
-                currentState = model.state
-                newState = { currentState | auth = True }
+                (authModel, cmd) =
+                    Auth.update msg model.authModel
             in
-                { model | state = newState } ! []
-        _ -> 
+                ({ model | authModel = authModel }, Cmd.map AuthMsg cmd)
+        _ ->
             model ! []

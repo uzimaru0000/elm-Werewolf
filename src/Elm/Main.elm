@@ -4,7 +4,7 @@ import Html exposing (program)
 import Model exposing (..)
 import View exposing (..)
 import Update exposing (..)
-import Firebase exposing (..)
+import Auth.Sub as Auth exposing (..)
 
 main : Program Never Model Msg
 main =
@@ -18,8 +18,6 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    [ loginSuccess LoginSuccess
-    , logoutSuccess LogoutSuccess
-    , authStateCheck AuthStateCheck
+    [ Auth.subscriptions model.authModel |> Sub.map AuthMsg
     ]
     |> Sub.batch

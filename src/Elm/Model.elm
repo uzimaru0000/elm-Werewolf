@@ -1,26 +1,18 @@
 module Model exposing (..)
 
 import User exposing (..)
-
-type alias State =
-    { auth : Bool
-    }
+import Auth.Model as Auth
 
 type alias Model = 
-    { user : Maybe User
-    , state : State
+    { authModel : Auth.Model
     }
 
 
 type Msg
     = NoOp
-    | Login
-    | Logout
-    | LoginSuccess User
-    | LogoutSuccess ()
-    | AuthStateCheck ()
+    | AuthMsg Auth.Msg
 
 
 init : Model
 init =
-    Model Nothing (State False)
+    Model Auth.init
