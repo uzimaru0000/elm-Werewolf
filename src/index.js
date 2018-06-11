@@ -45,5 +45,16 @@ app.ports.logout.subscribe(_ => {
     if (auth.currentUser) auth.signOut().then(x => app.ports.logoutSuccess.send(null));
 });
 
+app.ports.createRoom.subscribe(model => {
+    const newRoom = {
+        name : model.roomName,
+        ownerID : auth.currentUser.uid,
+        member : [auth.currentUser.uid],
+        maxNum : model.maxNum,
+        pass : model.pass
+    };
+
+    db.ref('room').push(newRoom);
+});
 
 // bulma triggers
