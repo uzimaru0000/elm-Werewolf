@@ -47,8 +47,7 @@ navbarEnd { user, state } =
                     , div
                         [ class "navbar-dropdown" ]
                         [ div
-                            [ class "navbar-item"
-                            , style [ ("color", "red") ]
+                            [ class "navbar-item has-text-danger"
                             , onClick Logout
                             ]
                             [ text "logout" ]
