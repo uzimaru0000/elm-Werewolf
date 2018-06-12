@@ -7,6 +7,7 @@ type alias Model =
     , pass : Maybe String
     , isActive : Bool
     , isInputError : Bool
+    , isSuccess : Maybe Bool
     }
 
 
@@ -17,6 +18,7 @@ type Msg
     | Activate
     | Exit
     | Create
+    | Success ()
 
 
 init : Model
@@ -26,4 +28,5 @@ init =
     , pass = Nothing
     , isActive = False
     , isInputError = False
+    , isSuccess = Nothing
     }

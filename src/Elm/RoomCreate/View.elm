@@ -114,6 +114,13 @@ footer model =
         [ class "modal-card-foot" ]
         [ button
             [ class "button is-link"
+            , classList
+                [ ( "is-loading"
+                  , model.isSuccess
+                    |> Maybe.map not
+                    |> Maybe.withDefault False
+                  )
+                ]
             , onClick Create
             ]
             [ text "Create" ]

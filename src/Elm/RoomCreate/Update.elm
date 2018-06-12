@@ -43,4 +43,8 @@ update msg model =
                 Nothing ->
                     { model | roomName = Just "", isInputError = True } ! []
                 Just _ ->
-                    model ! [ createRoom model ]
+                    { model | isSuccess = Just False } ! [ createRoom model ]
+
+        Success _ ->
+            init ! []
+            |> Debug.log ""

@@ -3,6 +3,7 @@ module View exposing (..)
 import Model exposing (..)
 import Auth.View as Auth exposing (..)
 import RoomCreate.View as RoomCreate exposing (..)
+import RoomListing.View as RoomListing exposing (..)
 import RoomCreate.Model as RoomCreate
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -20,6 +21,7 @@ view model =
                 , RoomCreateMsg RoomCreate.Activate |> onClick
                 ]
                 [ text "NewRoom" ]
+            , RoomListing.view model.roomListing |> Html.map RoomListingMsg
             ]
         , RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
         ]

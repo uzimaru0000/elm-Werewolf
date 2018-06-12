@@ -25,12 +25,12 @@ auth.onAuthStateChanged(user => {
     app.ports.authStateCheck.send(null);
     if (user) {
         const userData = {
-            uid : user.uid,
-            name : user.displayName,
-            iconUrl : user.photoURL
+            uid: user.uid,
+            name: user.displayName,
+            iconUrl: user.photoURL
         };
-        app.ports.loginSuccess.send(userData);
-        db.ref(`users/${user.uid}`).set({ name : userData.name, iconUrl : userData.iconUrl });
+        app.ports.getUser.send(userData);
+        db.ref(`users/${user.uid}`).set({ name: userData.name, iconUrl: userData.iconUrl });
     }
 });
 
@@ -38,24 +38,54 @@ auth.onAuthStateChanged(user => {
 import { Main } from './Elm/Main.elm';
 const app = Main.fullscreen();
 
+// login request
 app.ports.login.subscribe(_ => {
     if (!auth.currentUser) auth.signInWithRedirect(provider);
 });
 
+// logout request
 app.ports.logout.subscribe(_ => {
-    if (auth.currentUser) auth.signOut().then(x => app.ports.logoutSuccess.send(null));
+    if (auth.currentUser) auth.signOut().then(_ => app.ports.requestSuccess.send(null));
 });
 
+// create room
 app.ports.createRoom.subscribe(model => {
     const newRoom = {
-        name : model.roomName,
-        ownerID : auth.currentUser.uid,
-        member : [auth.currentUser.uid],
-        maxNum : model.maxNum,
-        pass : model.pass
+        name: model.roomName,
+        ownerID: auth.currentUser.uid,
+        member: [auth.currentUser.uid],
+        maxNum: model.maxNum,
+        pass: model.pass
     };
 
-    db.ref('room').push(newRoom);
+    db.ref('room')
+        .push(newRoom)
+        .then(_ => app.ports.requestSuccess.send(null));
 });
 
-// bulma triggers
+// getList request
+const newRoom = ss => {
+    return {
+        uid: ss.key,
+        name: ss.val().name,
+        ownerID: ss.val().ownerID,
+        member: ss.val().member,
+        maxNum: ss.val().maxNum,
+        pass: ss.val().pass || null
+    };
+};
+
+const sendRoomList = ss => {
+    const roomList = [];
+    ss.forEach(x => {
+        roomList.push(newRoom(x));
+    });
+    app.ports.getRoomList.send(roomList);
+}
+
+app.ports.listRequest.subscribe(_ => {
+    app.ports.loadingStart.send(null);
+    db.ref('room').once('value').then(ss => sendRoomList(ss));
+});
+
+db.ref('room').on('value', ss => sendRoomList(ss));
