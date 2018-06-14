@@ -12,8 +12,14 @@ view model =
         [ class "navbar is-dark is-fixed-top"
         ]
         [ div [ class "navbar-brand" ]
-            [ div [ class "navbar-item" ] [ text "WereWolf Online" ] ]
-        , div [ class "navbar-menu" ]
+            [ div [ class "navbar-item" ] [ text "WereWolf Online" ]
+            , div [ class "navbar-burger" ]
+                [ span [] []
+                , span [] [] 
+                , span [] [] 
+                ]
+            ]
+        , div [ class "navbar-menu is-active" ]
             [ navbarEnd model
             ]
         ]
