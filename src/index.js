@@ -29,7 +29,7 @@ auth.onAuthStateChanged(user => {
             name: user.displayName,
             iconUrl: user.photoURL
         };
-        app.ports.getUser.send(userData);
+        app.ports.loginSuccess.send(userData);
         db.ref(`users/${user.uid}`).set({ name: userData.name, iconUrl: userData.iconUrl });
     }
 });
@@ -45,7 +45,7 @@ app.ports.login.subscribe(_ => {
 
 // logout request
 app.ports.logout.subscribe(_ => {
-    if (auth.currentUser) auth.signOut().then(_ => app.ports.requestSuccess.send(null));
+    if (auth.currentUser) auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
 });
 
 // create room
@@ -60,7 +60,7 @@ app.ports.createRoom.subscribe(model => {
 
     db.ref('room')
         .push(newRoom)
-        .then(_ => app.ports.requestSuccess.send(null));
+        .then(_ => app.ports.createRoomSuccess.send(null));
 });
 
 // getList request

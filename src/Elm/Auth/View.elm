@@ -9,10 +9,15 @@ import Html.Events exposing (..)
 view : Model -> Html Msg
 view model =
     nav
-        [ class "navbar is-dark is-fixed-top"
+        [ class "navbar is-fixed-top"
         ]
         [ div [ class "navbar-brand" ]
-            [ div [ class "navbar-item" ] [ text "WereWolf Online" ] ]
+            [ div
+                [ class "navbar-item" ]
+                [ span [ class "icon" ] [ i [ class "fab fa-wolf-pack-battalion" ] [] ]
+                , text "WereWolf Local"
+                ]
+            ]
         , div [ class "navbar-menu" ]
             [ navbarEnd model
             ]
@@ -24,15 +29,18 @@ navbarEnd { user, state } =
     div [ class "navbar-end" ]
         [ case user of
             Just user ->
-                div [ id "user-info"
+                div
+                    [ id "user-info"
                     , class "navbar-item has-dropdown is-hoverable"
                     ]
                     [ div
                         [ class "navbar-link" ]
-                        [ img [ user.iconUrl |> Maybe.withDefault "" |> src
-                              , style [ ("border-radius", "50%") ]
-                              ] []
-                        , span [ style [ ("padding-left", "8px") ] ] [ text user.name ]
+                        [ img
+                            [ user.iconUrl |> Maybe.withDefault "" |> src
+                            , style [ ( "border-radius", "50%" ) ]
+                            ]
+                            []
+                        , span [ style [ ( "padding-left", "8px" ) ] ] [ text user.name ]
                         ]
                     , div
                         [ class "navbar-dropdown" ]
@@ -49,7 +57,7 @@ navbarEnd { user, state } =
                     [ div
                         [ onClick Login
                         , class "button is-info"
-                        , classList [ ("is-loading", not state) ]
+                        , classList [ ( "is-loading", not state ) ]
                         ]
                         [ text "login" ]
                     ]

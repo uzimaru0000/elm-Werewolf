@@ -15,13 +15,23 @@ view model =
     div
         []
         [ Auth.view model.auth |> Html.map AuthMsg
-        , div [ class "container" ]
-            [ button
-                [ class "button"
-                , RoomCreateMsg RoomCreate.Activate |> onClick
+        , section
+            [ class "hero is-medium is-primary block" ]
+            [ div
+                [ class "hero-body" ]
+                [ div
+                    [ class "container" ]
+                    [ h1
+                        [ class "title" ]
+                        [ text "WereWolf Local" ]
+                    , h2
+                        [ class "subtitle" ]
+                        [ text "this is sub title" ]
+                    ]
                 ]
-                [ text "NewRoom" ]
-            , RoomListing.view model.roomListing |> Html.map RoomListingMsg
+            ]
+        , div [ class "container" ]
+            [ RoomListing.view model.roomListing |> Html.map RoomListingMsg
             ]
         , RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
         ]
