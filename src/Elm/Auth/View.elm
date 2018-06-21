@@ -12,32 +12,48 @@ view model =
         [ class "navbar is-dark is-fixed-top"
         ]
         [ div [ class "navbar-brand" ]
-            [ div [ class "navbar-item" ] [ text "WereWolf Online" ] ]
-        , div [ class "navbar-menu" ]
-            [ navbarEnd model
+            [ div [ class "navbar-item" ] [ text "WereWolf Online" ]
+            , div
+                [ class "navbar-burger"
+                , classList [ ( "is-active", model.menuClick ) ]
+                , onClick MenuClick
+                ]
+                [ span [] []
+                , span [] []
+                , span [] []
+                ]
             ]
+        , div
+            [ class "navbar-menu"
+            , classList [ ( "is-active", model.menuClick ) ]
+            ]
+            [ navbarEnd model ]
         ]
 
 
 navbarEnd : Model -> Html Msg
-navbarEnd { user, state } =
+navbarEnd { user, state, menuClick } =
     div [ class "navbar-end" ]
         [ case user of
             Just user ->
-                div [ id "user-info"
-                    , class "navbar-item has-dropdown is-hoverable"
+                div
+                    [ class "navbar-item has-dropdown"
+                    , classList [ ( "is-active", menuClick ) ]
                     ]
                     [ div
-                        [ class "navbar-link" ]
-                        [ img [ user.iconUrl |> Maybe.withDefault "" |> src
-                              , style [ ("border-radius", "50%") ]
-                              ] []
-                        , span [ style [ ("padding-left", "8px") ] ] [ text user.name ]
+                        [ class "navbar-link is-dark is-hidden-touch"
+                        , onClick MenuClick
+                        ]
+                        [ img
+                            [ user.iconUrl |> Maybe.withDefault "" |> src
+                            , style [ ( "border-radius", "50%" ) ]
+                            ]
+                            []
                         ]
                     , div
                         [ class "navbar-dropdown" ]
-                        [ div
-                            [ class "navbar-item has-text-danger"
+                        [ a
+                            [ class "navbar-item  has-text-danger"
                             , onClick Logout
                             ]
                             [ text "logout" ]
@@ -49,7 +65,7 @@ navbarEnd { user, state } =
                     [ div
                         [ onClick Login
                         , class "button is-info"
-                        , classList [ ("is-loading", not state) ]
+                        , classList [ ( "is-loading", not state ) ]
                         ]
                         [ text "login" ]
                     ]
