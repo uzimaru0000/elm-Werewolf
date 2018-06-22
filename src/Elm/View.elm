@@ -29,6 +29,20 @@ view model =
                         [ text "this is sub title" ]
                     ]
                 ]
+            , div
+                [ class "hero-foot" ]
+                [ nav
+                    [ class "tabs is-boxed is-fullwidth" ]
+                    [ div
+                        [ class "container" ]
+                        [ ul []
+                            [ li [ class "is-active" ] [ a [] [ text "Rooms" ] ]
+                            , li [] [ a [] [ text "Hoge" ] ]
+                            , li [] [ a [] [ text "Foo" ] ]
+                            ]
+                        ]
+                    ]
+                ]
             ]
         , div [ class "container" ]
             [ RoomListing.view model.roomListing |> Html.map RoomListingMsg

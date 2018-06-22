@@ -8,5 +8,6 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     [ getRoomList GetList
     , loadingStart LoadStart
+    , getUsers GetUserList
     ]
         |> Sub.batch

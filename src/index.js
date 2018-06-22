@@ -89,3 +89,15 @@ app.ports.listRequest.subscribe(_ => {
 });
 
 db.ref('room').on('value', ss => sendRoomList(ss));
+
+app.ports.usersRequest.subscribe(_ => {
+    db.ref('users').once('value').then(ss => {
+        const userList = [];
+        ss.forEach(x => {
+            const user = x.val();
+            user.uid = x.key;
+            userList.push(user);
+        });
+        app.ports.getUsers.send(userList);
+    });
+});
