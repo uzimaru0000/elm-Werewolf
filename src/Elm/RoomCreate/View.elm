@@ -4,38 +4,14 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import RoomCreate.Model exposing (..)
+import Rule exposing (..)
 
 
 view : Model -> Html Msg
 view model =
     div
-        [ class "modal"
-        , classList [ ( "is-active", model.isActive ) ]
-        ]
-        [ div
-            [ class "modal-background"
-            , onClick Exit
-            ]
-            []
-        , div
-            [ class "modal-card" ]
-            [ header
-            , forms model
-            , footer model
-            ]
-        ]
-
-
-header : Html Msg
-header =
-    Html.header
-        [ class "modal-card-head" ]
-        [ p [ class "modal-card-title" ] [ text "Create Room" ]
-        , button
-            [ class "delete"
-            , onClick Exit
-            ]
-            []
+        []
+        [ forms model
         ]
 
 
@@ -105,28 +81,86 @@ forms model =
                     ]
                 ]
             ]
-        ]
-
-
-footer : Model -> Html Msg
-footer model =
-    Html.footer
-        [ class "modal-card-foot" ]
-        [ button
-            [ class "button is-link"
-            , classList
-                [ ( "is-loading"
-                  , model.isSuccess
-                    |> Maybe.map not
-                    |> Maybe.withDefault False
-                  )
+        , div
+            [ class "field" ]
+            [ label [ class "label" ] [ text "Role" ]
+            , model.ruleSet
+                |> List.map ruleForm
+                |> div [ class "control" ]
+            ]
+        , div
+            [ class "field is-grouped is-grouped-right" ]
+            [ div [ class "control" ]
+                [ button
+                    [ class "button is-link"
+                    , classList
+                        [ ( "is-loading"
+                          , model.isSuccess
+                                |> Maybe.map not
+                                |> Maybe.withDefault False
+                          )
+                        ]
+                    , onClick Create
+                    ]
+                    [ text "Create" ]
                 ]
-            , onClick Create
             ]
-            [ text "Create" ]
-        , button
-            [ class "button is-text"
-            , onClick Exit
-            ]
-            [ text "Cancel" ]
         ]
+
+
+ruleForm : RuleSet -> Html Msg
+ruleForm ( rule, n ) =
+    let
+        flag =
+            n > 0
+    in
+        div [ class "field has-addons" ]
+            [ div [ class "control" ]
+                [ button
+                    [ class "button is-light"
+                    , classList
+                        [ ( "is-light", not flag )
+                        , ( "is-info", flag )
+                        ]
+                    , style [ ( "width", "128px" ) ]
+                    , onClick <| RuleActive rule
+                    ]
+                    [ span [ class "icon is-medium" ] [ i [ class <| ruleIcon rule ] [] ]
+                    , span [] [ text <| toString rule ]
+                    ]
+                ]
+            , if flag then
+                div [ class "control" ]
+                    [ input
+                        [ class "input"
+                        , type_ "number"
+                        , value <| toString n
+                        , onInput <| InputRoleNum rule
+                        ]
+                        []
+                    ]
+              else
+                text ""
+            ]
+
+
+ruleIcon : Rule -> String
+ruleIcon rule =
+    case rule of
+        Villager ->
+            "fas fa-male"
+
+        Werewolf ->
+            "fab fa-wolf-pack-battalion"
+
+        Seer ->
+            "fas fa-magic"
+
+        Hunter ->
+            "fas fa-user-shield"
+
+        Madman ->
+            "fas fa-skull"
+
+        Psychic ->
+            "fas fa-star"

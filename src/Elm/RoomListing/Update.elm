@@ -3,6 +3,8 @@ module RoomListing.Update exposing (..)
 import RoomListing.Model exposing (..)
 import Firebase exposing (..)
 import Dict exposing (..)
+import Json.Decode as Json
+import Room exposing (..)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -11,12 +13,17 @@ update msg model =
         ListRequest ->
             model ! [ listRequest () ]
 
-        GetList list ->
-            { model | roomList = list, isLoading = Just False } ! [ usersRequest () ]
-
-        LoadStart _ ->
-            { model | isLoading = Just True } ! []
-
+        GetList value ->
+            let
+                newList = Json.decodeValue (Json.list roomDecoder) value
+            in
+                case newList of
+                    Ok list ->
+                        { model | roomList = list, isLoading = Just False } ! []
+                    
+                    Err _ ->
+                        model ! []
+                        
         GetUserList list ->
             let
                 newDict =
@@ -24,3 +31,6 @@ update msg model =
                         |> List.foldl (\x acc -> Dict.insert x.uid x acc) model.userDict
             in
                 { model | userDict = newDict } ! []
+
+        LoadStart _ ->
+            { model | isLoading = Just True } ! []

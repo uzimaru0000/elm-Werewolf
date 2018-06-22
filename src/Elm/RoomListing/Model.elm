@@ -3,6 +3,7 @@ module RoomListing.Model exposing (..)
 import Room exposing (..)
 import User exposing (..)
 import Dict exposing (..)
+import Json.Decode as JD
 
 
 type alias Model =
@@ -14,7 +15,7 @@ type alias Model =
 
 type Msg
     = ListRequest
-    | GetList (List Room)
+    | GetList JD.Value
     | LoadStart ()
     | GetUserList (List User)
 

@@ -2,6 +2,7 @@ module RoomCreate.Update exposing (..)
 
 import RoomCreate.Model exposing (..)
 import Firebase exposing (..)
+import Room exposing (..)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -32,6 +33,41 @@ update msg model =
             }
                 ! []
 
+        RuleActive rule ->
+            let
+                helper t ( r, n ) =
+                    if r == t then
+                        if n == 0 then
+                            ( r, 1 )
+                        else
+                            ( r, 0 )
+                    else
+                        ( r, n )
+
+                newSet =
+                    model.ruleSet
+                        |> List.map (helper rule)
+            in
+                { model | ruleSet = newSet } ! []
+
+        InputRoleNum rule str ->
+            let
+                num =
+                    String.toInt str
+                        |> Result.toMaybe
+
+                helper t n ( r, m ) =
+                    if r == t then
+                        ( r, n |> Maybe.withDefault m )
+                    else
+                        ( r, m )
+
+                newSet =
+                    model.ruleSet
+                        |> List.map (helper rule num)
+            in
+                { model | ruleSet = newSet } ! []
+
         Activate ->
             { model | isActive = True } ! []
 
@@ -42,9 +78,15 @@ update msg model =
             case model.roomName of
                 Nothing ->
                     { model | roomName = Just "", isInputError = True } ! []
+
                 Just _ ->
-                    { model | isSuccess = Just False } ! [ createRoom model ]
+                    { model | isSuccess = Just False }
+                        ! [ model
+                                |> modelToValue
+                                |> createRoom
+                          ]
 
         Success _ ->
-            init ! []
-            |> Debug.log ""
+            init
+                ! []
+                |> Debug.log ""
