@@ -50,12 +50,14 @@ app.ports.logout.subscribe(_ => {
 
 // create room
 app.ports.createRoom.subscribe(model => {
+
     const newRoom = {
         name: model.roomName,
         ownerID: auth.currentUser.uid,
         member: [auth.currentUser.uid],
         maxNum: model.maxNum,
-        pass: model.pass
+        pass: model.pass,
+        ruleSet: model.ruleSet
     };
 
     db.ref('room')
@@ -71,7 +73,8 @@ const newRoom = ss => {
         ownerID: ss.val().ownerID,
         member: ss.val().member,
         maxNum: ss.val().maxNum,
-        pass: ss.val().pass || null
+        pass: ss.val().pass || null,
+        ruleSet: ss.val().ruleSet
     };
 };
 

@@ -19,7 +19,7 @@ update msg model =
             in
                 case newList of
                     Ok list ->
-                        { model | roomList = list, isLoading = Just False } ! []
+                        { model | roomList = list, isLoading = Just False } ! [ usersRequest () ]
                     
                     Err _ ->
                         model ! []

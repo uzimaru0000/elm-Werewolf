@@ -18,8 +18,8 @@ type alias RuleSet =
     ( Rule, Int )
 
 
-rule2String : String -> Maybe Rule
-rule2String str =
+stringToRule : String -> Maybe Rule
+stringToRule str =
     case str of
         "Villager" ->
             Just Villager
@@ -46,7 +46,7 @@ rule2String str =
 ruleDecoder : JD.Decoder Rule
 ruleDecoder =
     JD.string
-        |> JD.map rule2String
+        |> JD.map stringToRule
         |> JD.andThen
             (\x ->
                 case x of
@@ -67,7 +67,7 @@ ruleEncoder rule =
 
 ruleSetDecoder : JD.Decoder RuleSet
 ruleSetDecoder =
-    JD.map2 (,) ruleDecoder JD.int
+    JD.map2 (,) (JD.index 0 ruleDecoder) (JD.index 1 JD.int)
 
 
 ruleSetEncoder : RuleSet -> JE.Value

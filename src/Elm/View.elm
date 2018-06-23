@@ -37,7 +37,7 @@ view model =
                         [ class "container" ]
                         [ ul []
                             [ li [ class "is-active" ] [ a [] [ text "Rooms" ] ]
-                            , li [] [ a [] [ text "Hoge" ] ]
+                            , li [] [ a [] [ text "Create" ] ]
                             , li [] [ a [] [ text "Foo" ] ]
                             ]
                         ]
@@ -45,6 +45,7 @@ view model =
                 ]
             ]
         , div [ class "container" ]
-            [ RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
+            [ RoomListing.view model.roomListing |> Html.map RoomListingMsg
+            , RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
             ]
         ]

@@ -79,12 +79,15 @@ update msg model =
                 Nothing ->
                     { model | roomName = Just "", isInputError = True } ! []
 
-                Just _ ->
-                    { model | isSuccess = Just False }
-                        ! [ model
-                                |> modelToValue
-                                |> createRoom
-                          ]
+                Just str ->
+                    if (not << String.isEmpty) str then
+                        { model | isSuccess = Just False }
+                            ! [ model
+                                    |> modelToValue
+                                    |> createRoom
+                              ]
+                    else
+                        model ! []
 
         Success _ ->
             init
