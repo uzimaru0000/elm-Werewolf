@@ -1,6 +1,8 @@
 module Update exposing (..)
 
 import Model exposing (..)
+import Routing exposing (..)
+import Navigation
 import Auth.Update as Auth exposing (..)
 import RoomCreate.Update as RoomCreate exposing (..)
 import RoomListing.Update as RoomListing exposing (..)
@@ -9,6 +11,15 @@ import RoomListing.Update as RoomListing exposing (..)
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        LocationChange loc ->
+            let
+                newRoute = parseLocation loc
+            in
+                { model | route = newRoute } ! []
+
+        RouteChange route ->
+            model ! [ Navigation.newUrl <| routeToUrl route ]
+
         AuthMsg msg ->
             let
                 ( auth, cmd ) =
