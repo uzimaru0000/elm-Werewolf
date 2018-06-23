@@ -18,6 +18,28 @@ type alias RuleSet =
     ( Rule, Int )
 
 
+ruleIcon : Rule -> String
+ruleIcon rule =
+    case rule of
+        Villager ->
+            "fas fa-male"
+
+        Werewolf ->
+            "fab fa-wolf-pack-battalion"
+
+        Seer ->
+            "fas fa-magic"
+
+        Hunter ->
+            "fas fa-user-shield"
+
+        Madman ->
+            "fas fa-skull"
+
+        Psychic ->
+            "fas fa-star"
+
+
 stringToRule : String -> Maybe Rule
 stringToRule str =
     case str of

@@ -46,6 +46,5 @@ view model =
             ]
         , div [ class "container" ]
             [ RoomListing.view model.roomListing |> Html.map RoomListingMsg
-            , RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
             ]
         ]
