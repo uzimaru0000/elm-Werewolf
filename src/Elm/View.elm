@@ -16,7 +16,60 @@ view model =
     div
         []
         [ Auth.view model.auth |> Html.map AuthMsg
-        , section
+        , hero model
+        , div [ class "container" ]
+            [ page model
+            ]
+        ]
+
+
+locateTab : Route -> Html Msg
+locateTab route =
+    [ RoomListing
+    , RoomCreate
+    ]
+        |> List.map (\x -> ( x, locateString x ))
+        |> List.map
+            (\( r, str ) ->
+                li
+                    [ classList [ ( "is-active", r == route ) ]
+                    ]
+                    [ a
+                        [ onClick <| RouteChange r ]
+                        [ text str ]
+                    ]
+            )
+        |> ul []
+
+
+locateString : Route -> String
+locateString route =
+    case route of
+        RoomListing ->
+            "Rooms"
+
+        RoomCreate ->
+            "Create"
+
+        _ ->
+            ""
+
+
+hero : Model -> Html Msg
+hero model =
+    let
+        titles =
+            case model.route of
+                RoomListing ->
+                    ("RoomList", "現在のすべてのルームです")
+                
+                RoomCreate ->
+                    ("Createing Room", "ルームを作成します")
+
+                NotFound ->
+                    ("NotFound", "存在しないページです")
+    in
+        section
             [ class "hero is-medium is-primary block" ]
             [ div
                 [ class "hero-body" ]
@@ -24,10 +77,10 @@ view model =
                     [ class "container" ]
                     [ h1
                         [ class "title" ]
-                        [ text "WereWolf Local" ]
+                        [ text <| Tuple.first titles ]
                     , h2
                         [ class "subtitle" ]
-                        [ text "this is sub title" ]
+                        [ text <| Tuple.second titles ]
                     ]
                 ]
             , div
@@ -41,39 +94,6 @@ view model =
                     ]
                 ]
             ]
-        , div [ class "container" ]
-            [ page model
-            ]
-        ]
-
-
-locateTab : Route -> Html Msg
-locateTab route =
-    [ RoomListing
-    , RoomCreate
-    ]
-    |> List.map (\x -> (x, locateString x))
-    |> List.map (\(r, str) -> 
-        li
-            [ classList [ ("is-active", r == route) ]
-            ]
-            [ a
-                [ onClick <| RouteChange r ]
-                [ text str ]
-            ]
-    )
-    |> ul []
-
-
-locateString : Route -> String
-locateString route =
-    case route of
-        RoomListing ->
-            "Rooms"
-        RoomCreate ->
-            "Create"
-        _ ->
-            ""
 
 
 page : Model -> Html Msg
@@ -81,9 +101,9 @@ page model =
     case model.route of
         RoomListing ->
             RoomListing.view model.roomListing |> Html.map RoomListingMsg
-        
+
         RoomCreate ->
             RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
-        
+
         _ ->
             text "not found"

@@ -3,6 +3,8 @@ module RoomCreate.Update exposing (..)
 import RoomCreate.Model exposing (..)
 import Firebase exposing (..)
 import Room exposing (..)
+import Routing exposing (..)
+import Navigation exposing (..)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -90,6 +92,4 @@ update msg model =
                         model ! []
 
         Success _ ->
-            init
-                ! []
-                |> Debug.log ""
+            init ! [ Navigation.newUrl <| routeToUrl RoomListing ]
