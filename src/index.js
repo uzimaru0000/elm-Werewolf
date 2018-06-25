@@ -23,11 +23,12 @@ auth.languageCode = 'jp';
 auth.getRedirectResult();
 auth.onAuthStateChanged(user => {
     app.ports.authStateCheck.send(null);
+
     if (user) {
         const userData = {
             uid: user.uid,
-            name: user.displayName,
-            iconUrl: user.photoURL
+            name: user.displayName || "名無しさん",
+            iconUrl: user.photoURL || null
         };
         app.ports.loginSuccess.send(userData);
         db.ref(`users/${user.uid}`).set({ name: userData.name, iconUrl: userData.iconUrl });
@@ -39,13 +40,37 @@ import { Main } from './Elm/Main.elm';
 const app = Main.fullscreen();
 
 // login request
-app.ports.login.subscribe(_ => {
-    if (!auth.currentUser) auth.signInWithRedirect(provider);
+app.ports.login.subscribe(type => {
+    if (!auth.currentUser) {
+        switch (type) {
+            case 'Twitter':
+                auth.signInWithRedirect(provider);
+                break;
+            case 'Anonymous':
+                auth.signInAnonymously();
+                break;
+        }
+    }
 });
 
 // logout request
 app.ports.logout.subscribe(_ => {
-    if (auth.currentUser) auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
+    if (auth.currentUser) {
+        // 匿名アカウントの情報を削除
+        if (auth.currentUser.isAnonymous) {
+            db.ref(`users/${auth.currentUser.uid}`).remove();
+            db.ref(`room`)
+                .once('value')
+                .then(ss => {
+                    ss.forEach(x => {
+                        if (x.val().ownerID === auth.currentUser.uid) {
+                            db.ref(`room/${x.key}`).remove();
+                        }
+                    });
+                });
+        }
+        auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
+    }
 });
 
 // create room
@@ -99,6 +124,7 @@ app.ports.usersRequest.subscribe(_ => {
         ss.forEach(x => {
             const user = x.val();
             user.uid = x.key;
+            user.iconUrl = user.iconUrl || null;
             userList.push(user);
         });
         app.ports.getUsers.send(userList);

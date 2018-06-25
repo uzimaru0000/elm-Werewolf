@@ -2,6 +2,7 @@ module Auth.Model exposing (..)
 
 import User exposing (..)
 
+
 type alias Model =
     { user : Maybe User
     , state : Bool
@@ -9,8 +10,13 @@ type alias Model =
     }
 
 
+type LoginType
+    = Twitter
+    | Anonymous
+
+
 type Msg
-    = Login
+    = Login LoginType
     | Logout
     | LoginSuccess User
     | MenuClick

@@ -13,9 +13,13 @@ update msg model =
     case msg of
         LocationChange loc ->
             let
-                newRoute = parseLocation loc
+                newRoute =
+                    parseLocation loc
             in
-                { model | route = newRoute } ! []
+                if model.auth.user /= Nothing then
+                    { model | route = newRoute } ! []
+                else
+                    { model | route = Login } ! []
 
         RouteChange route ->
             model ! [ Navigation.newUrl <| routeToUrl route ]
@@ -39,7 +43,7 @@ update msg model =
                 ( roomListing, cmd ) =
                     RoomListing.update msg model.roomListing
             in
-                ( { model | roomListing = roomListing }, Cmd.map RoomListingMsg cmd ) 
+                ( { model | roomListing = roomListing }, Cmd.map RoomListingMsg cmd )
 
         _ ->
             model ! []

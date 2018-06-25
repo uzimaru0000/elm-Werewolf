@@ -1,5 +1,6 @@
 module Auth.View exposing (..)
 
+import User exposing (..)
 import Auth.Model exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -45,7 +46,7 @@ navbarEnd { user, state, menuClick } =
                         , onClick MenuClick
                         ]
                         [ img
-                            [ user.iconUrl |> Maybe.withDefault "" |> src
+                            [ user.iconUrl |> Maybe.withDefault anonymousIcon |> src
                             , style [ ( "border-radius", "50%" ) ]
                             ]
                             []
@@ -61,12 +62,57 @@ navbarEnd { user, state, menuClick } =
                     ]
 
             Nothing ->
-                div [ class "navbar-item" ]
-                    [ div
-                        [ onClick Login
-                        , class "button is-info"
-                        , classList [ ( "is-loading", not state ) ]
-                        ]
-                        [ text "login" ]
+                text ""
+        ]
+
+
+loginView : Model -> Html Msg
+loginView model =
+    div [ class "columns is-centered" ]
+        [ div
+            [ class "column box is-half" ]
+            [ figure
+                [ class "image is-128x128"
+                , style
+                    [ ( "margin", "16px auto 32px" )
+                    , ( "border-radius", "50%" )
                     ]
+                ]
+                [ img
+                    [ src "https://bulma.io/images/placeholders/128x128.png"
+                    , style
+                    [ ( "border-radius", "50%" )
+                    ]
+                    ]
+                    []
+                ]
+            , div
+                [ class "field is-grouped is-grouped-centered" ]
+                [ div
+                    [ class "control" ]
+                    [ button
+                        [ class "button is-medium is-info"
+                        , onClick <| Login Twitter
+                        ]
+                        [ span [ class "icon" ]
+                            [ i [ class "fab fa-twitter" ] [] ]
+                        , span [] [ text "Twitter" ]
+                        ]
+                    ]
+                ]
+            , div
+                [ class "field is-grouped is-grouped-centered" ]
+                [ div
+                    [ class "control" ]
+                    [ button
+                        [ class "button is-medium is-dark"
+                        , onClick <| Login Anonymous
+                        ]
+                        [ span [ class "icon" ]
+                            [ i [ class "fas fa-question-circle" ] [] ]
+                        , span [] [ text "Anonymous" ]
+                        ]
+                    ]
+                ]
+            ]
         ]

@@ -61,13 +61,16 @@ hero model =
         titles =
             case model.route of
                 RoomListing ->
-                    ("RoomList", "現在のすべてのルームです")
-                
+                    ( "RoomList", "現在のすべてのルームです" )
+
                 RoomCreate ->
-                    ("Createing Room", "ルームを作成します")
+                    ( "Createing Room", "ルームを作成します" )
+
+                Login ->
+                    ( "Login", "" )
 
                 NotFound ->
-                    ("NotFound", "存在しないページです")
+                    ( "NotFound", "存在しないページです" )
     in
         section
             [ class "hero is-medium is-primary block" ]
@@ -83,16 +86,19 @@ hero model =
                         [ text <| Tuple.second titles ]
                     ]
                 ]
-            , div
-                [ class "hero-foot" ]
-                [ nav
-                    [ class "tabs is-boxed is-fullwidth" ]
-                    [ div
-                        [ class "container" ]
-                        [ locateTab model.route
+            , if model.route /= Login then
+                div
+                    [ class "hero-foot" ]
+                    [ nav
+                        [ class "tabs is-boxed is-fullwidth" ]
+                        [ div
+                            [ class "container" ]
+                            [ locateTab model.route
+                            ]
                         ]
                     ]
-                ]
+              else
+                text ""
             ]
 
 
@@ -104,6 +110,9 @@ page model =
 
         RoomCreate ->
             RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
+
+        Login ->
+            Auth.loginView model.auth |> Html.map AuthMsg
 
         _ ->
             text "not found"

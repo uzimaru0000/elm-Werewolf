@@ -4,7 +4,7 @@ import User exposing (..)
 import Json.Encode
 import Json.Decode
 
-port login : () -> Cmd msg
+port login : String -> Cmd msg
 port logout : () -> Cmd msg
 port createRoom : Json.Encode.Value -> Cmd msg
 port listRequest : () -> Cmd msg
