@@ -12,7 +12,6 @@ type alias Model =
     , ruleSet : List RuleSet
     , isActive : Bool
     , isInputError : Bool
-    , isRuleError : Bool
     , isSuccess : Maybe Bool
     }
 
@@ -23,6 +22,8 @@ type Msg
     | InputPass String
     | RuleActive Rule
     | InputRoleNum Rule String
+    | Activate
+    | Exit
     | Create
     | Success ()
 
@@ -42,7 +43,6 @@ init =
         ]
     , isActive = False
     , isInputError = False
-    , isRuleError = False
     , isSuccess = Nothing
     }
 

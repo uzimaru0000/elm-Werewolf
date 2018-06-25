@@ -84,10 +84,6 @@ forms model =
         , div
             [ class "field" ]
             [ label [ class "label" ] [ text "Role" ]
-            , if model.isRuleError then
-                p [ class "help is-danger" ] [ text "Total role's num should be equal max member." ]
-              else
-                text ""
             , model.ruleSet
                 |> List.map ruleForm
                 |> div [ class "control" ]
@@ -117,9 +113,6 @@ ruleForm ( rule, n ) =
     let
         flag =
             n > 0
-
-        isSpecial =
-            Villager /= rule && Werewolf /= rule
     in
         div [ class "field has-addons" ]
             [ div [ class "control" ]
@@ -130,10 +123,7 @@ ruleForm ( rule, n ) =
                         , ( "is-info", flag )
                         ]
                     , style [ ( "width", "128px" ) ]
-                    , if isSpecial then
-                        onClick <| RuleActive rule
-                      else
-                        class ""
+                    , onClick <| RuleActive rule
                     ]
                     [ span [ class "icon is-medium" ] [ i [ class <| ruleIcon rule ] [] ]
                     , span [] [ text <| toString rule ]
@@ -146,10 +136,6 @@ ruleForm ( rule, n ) =
                         , type_ "number"
                         , value <| toString n
                         , onInput <| InputRoleNum rule
-                        , if not isSpecial then
-                            Html.Attributes.min "1"
-                          else
-                            class ""
                         ]
                         []
                     ]
