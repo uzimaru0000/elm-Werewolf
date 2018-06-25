@@ -70,26 +70,29 @@ update msg model =
             in
                 { model | ruleSet = newSet } ! []
 
-        Activate ->
-            { model | isActive = True } ! []
-
-        Exit ->
-            { model | isActive = False } ! []
-
         Create ->
-            case model.roomName of
-                Nothing ->
-                    { model | roomName = Just "", isInputError = True } ! []
+            let
+                setNum =
+                    model.ruleSet
+                        |> List.map Tuple.second
+                        |> List.sum
+            in
+                if model.maxNum == setNum then
+                    case model.roomName of
+                        Nothing ->
+                            { model | roomName = Just "", isInputError = True } ! []
 
-                Just str ->
-                    if (not << String.isEmpty) str then
-                        { model | isSuccess = Just False }
-                            ! [ model
-                                    |> modelToValue
-                                    |> createRoom
-                              ]
-                    else
-                        model ! []
+                        Just str ->
+                            if (not << String.isEmpty) str then
+                                { model | isSuccess = Just False }
+                                    ! [ model
+                                            |> modelToValue
+                                            |> createRoom
+                                      ]
+                            else
+                                model ! []
+                else
+                    { model | isRuleError = True } ! []
 
         Success _ ->
             init ! [ Navigation.newUrl <| routeToUrl RoomListing ]
