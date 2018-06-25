@@ -15,15 +15,16 @@ update msg model =
 
         GetList value ->
             let
-                newList = Json.decodeValue (Json.list roomDecoder) value
+                newList =
+                    Json.decodeValue (Json.list roomDecoder) value
             in
                 case newList of
                     Ok list ->
                         { model | roomList = list, isLoading = Just False } ! [ usersRequest () ]
-                    
+
                     Err _ ->
                         model ! []
-                        
+
         GetUserList list ->
             let
                 newDict =
@@ -34,3 +35,23 @@ update msg model =
 
         LoadStart _ ->
             { model | isLoading = Just True } ! []
+
+        InputRoomName str ->
+            { model
+                | serchRoomName =
+                    if String.isEmpty str then
+                        Nothing
+                    else
+                        Just str
+            }
+                ! []
+
+        CheckRule rule ->
+            let
+                newList =
+                    if List.member rule model.checkedRules then
+                        List.filter ((/=) rule) model.checkedRules
+                    else
+                        rule :: model.checkedRules
+            in
+                { model | checkedRules = newList } ! []
