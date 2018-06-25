@@ -31,6 +31,5 @@ update msg model =
                         newUrl <| routeToUrl Routing.Login
                     else
                         Cmd.none
-                
             in
                 { model | state = True } ! [ cmd ]

@@ -46,9 +46,6 @@ app.ports.login.subscribe(type => {
             case 'Twitter':
                 auth.signInWithRedirect(provider);
                 break;
-            case 'Anonymous':
-                auth.signInAnonymously();
-                break;
         }
     }
 });
@@ -56,19 +53,6 @@ app.ports.login.subscribe(type => {
 // logout request
 app.ports.logout.subscribe(_ => {
     if (auth.currentUser) {
-        // 匿名アカウントの情報を削除
-        if (auth.currentUser.isAnonymous) {
-            db.ref(`users/${auth.currentUser.uid}`).remove();
-            db.ref(`room`)
-                .once('value')
-                .then(ss => {
-                    ss.forEach(x => {
-                        if (x.val().ownerID === auth.currentUser.uid) {
-                            db.ref(`room/${x.key}`).remove();
-                        }
-                    });
-                });
-        }
         auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
     }
 });

@@ -1,6 +1,5 @@
 module Auth.View exposing (..)
 
-import User exposing (..)
 import Auth.Model exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -46,7 +45,7 @@ navbarEnd { user, state, menuClick } =
                         , onClick MenuClick
                         ]
                         [ img
-                            [ user.iconUrl |> Maybe.withDefault anonymousIcon |> src
+                            [ user.iconUrl |> Maybe.withDefault "" |> src
                             , style [ ( "border-radius", "50%" ) ]
                             ]
                             []
@@ -81,8 +80,8 @@ loginView model =
                 [ img
                     [ src "https://bulma.io/images/placeholders/128x128.png"
                     , style
-                    [ ( "border-radius", "50%" )
-                    ]
+                        [ ( "border-radius", "50%" )
+                        ]
                     ]
                     []
                 ]
@@ -97,20 +96,6 @@ loginView model =
                         [ span [ class "icon" ]
                             [ i [ class "fab fa-twitter" ] [] ]
                         , span [] [ text "Twitter" ]
-                        ]
-                    ]
-                ]
-            , div
-                [ class "field is-grouped is-grouped-centered" ]
-                [ div
-                    [ class "control" ]
-                    [ button
-                        [ class "button is-medium is-dark"
-                        , onClick <| Login Anonymous
-                        ]
-                        [ span [ class "icon" ]
-                            [ i [ class "fas fa-question-circle" ] [] ]
-                        , span [] [ text "Anonymous" ]
                         ]
                     ]
                 ]

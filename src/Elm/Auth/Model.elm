@@ -12,7 +12,6 @@ type alias Model =
 
 type LoginType
     = Twitter
-    | Anonymous
 
 
 type Msg
