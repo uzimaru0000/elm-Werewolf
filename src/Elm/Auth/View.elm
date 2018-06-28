@@ -99,5 +99,33 @@ loginView model =
                         ]
                     ]
                 ]
+            , div
+                [ class "field is-grouped is-grouped-centered" ]
+                [ div
+                    [ class "control" ]
+                    [ button
+                        [ class "button is-medium"
+                        , onClick <| Login Google
+                        ]
+                        [ span [ class "icon has-text-link" ]
+                            [ i [ class "fab fa-google" ] [] ]
+                        , span [] [ text "Google" ]
+                        ]
+                    ]
+                ]
+            , div
+                [ class "field is-grouped is-grouped-centered" ]
+                [ div
+                    [ class "control" ]
+                    [ button
+                        [ class "button is-medium is-black"
+                        , onClick <| Login GitHub
+                        ]
+                        [ span [ class "icon" ]
+                            [ i [ class "fab fa-github" ] [] ]
+                        , span [] [ text "GitHub" ]
+                        ]
+                    ]
+                ]
             ]
         ]

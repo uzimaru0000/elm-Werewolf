@@ -18,16 +18,19 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 const db = firebase.database();
-const provider = new firebase.auth.TwitterAuthProvider();
+const providers = {
+    Twitter: new firebase.auth.TwitterAuthProvider(),
+    Google: new firebase.auth.GoogleAuthProvider(),
+    GitHub: new firebase.auth.GithubAuthProvider()
+};
 auth.languageCode = 'jp';
 auth.getRedirectResult();
 auth.onAuthStateChanged(user => {
     app.ports.authStateCheck.send(null);
-
     if (user) {
         const userData = {
             uid: user.uid,
-            name: user.displayName || "名無しさん",
+            name: user.displayName,
             iconUrl: user.photoURL || null
         };
         app.ports.loginSuccess.send(userData);
@@ -42,11 +45,7 @@ const app = Main.fullscreen();
 // login request
 app.ports.login.subscribe(type => {
     if (!auth.currentUser) {
-        switch (type) {
-            case 'Twitter':
-                auth.signInWithRedirect(provider);
-                break;
-        }
+        auth.signInWithRedirect(providers[type]);
     }
 });
 

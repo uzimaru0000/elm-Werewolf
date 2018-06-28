@@ -12,6 +12,8 @@ type alias Model =
 
 type LoginType
     = Twitter
+    | Google
+    | GitHub
 
 
 type Msg
