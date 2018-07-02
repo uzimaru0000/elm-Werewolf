@@ -1,7 +1,7 @@
 module View exposing (..)
 
 import Model exposing (..)
-import Routing exposing (..)
+import Routing exposing (Route)
 import Auth.View as Auth exposing (..)
 import RoomCreate.View as RoomCreate exposing (..)
 import RoomListing.View as RoomListing exposing (..)
@@ -13,20 +13,27 @@ import Html.Events exposing (..)
 
 view : Model -> Html Msg
 view model =
+    case model.pageState of
+        Loaded page ->
+            frame page False
+
+        Transition page ->
+            frame page True
+
+
+frame : Page -> Bool -> Html Msg
+frame currentPage isLoading =
     div
         []
-        [ Auth.view model.auth |> Html.map AuthMsg
-        , hero model
-        , div [ class "container" ]
-            [ page model
-            ]
+        [ loading (isLoading |> Debug.log "")
+        , page currentPage
         ]
 
 
 locateTab : Route -> Html Msg
 locateTab route =
-    [ RoomListing
-    , RoomCreate
+    [ Routing.RoomListing
+    , Routing.RoomCreate
     ]
         |> List.map (\x -> ( x, locateString x ))
         |> List.map
@@ -45,29 +52,29 @@ locateTab route =
 locateString : Route -> String
 locateString route =
     case route of
-        RoomListing ->
+        Routing.RoomListing ->
             "Rooms"
 
-        RoomCreate ->
+        Routing.RoomCreate ->
             "Create"
 
         _ ->
             ""
 
 
-hero : Model -> Html Msg
-hero model =
+hero : Page -> Html Msg
+hero page =
     let
         titles =
-            case model.route of
-                RoomListing ->
-                    ("RoomList", "現在のすべてのルームです")
-                
-                RoomCreate ->
-                    ("Createing Room", "ルームを作成します")
+            case page of
+                RoomListing _ ->
+                    ( "RoomList", "現在のすべてのルームです" )
 
-                NotFound ->
-                    ("NotFound", "存在しないページです")
+                RoomCreate _ ->
+                    ( "Createing Room", "ルームを作成します" )
+
+                _ ->
+                    ( "NotFound", "存在しないページです" )
     in
         section
             [ class "hero is-medium is-primary block" ]
@@ -89,21 +96,44 @@ hero model =
                     [ class "tabs is-boxed is-fullwidth" ]
                     [ div
                         [ class "container" ]
-                        [ locateTab model.route
+                        [ locateTab <| pageToRoute page
                         ]
                     ]
                 ]
             ]
 
 
-page : Model -> Html Msg
-page model =
-    case model.route of
-        RoomListing ->
-            RoomListing.view model.roomListing |> Html.map RoomListingMsg
+page : Page -> Html Msg
+page page =
+    case page of
+        RoomListing model ->
+            div []
+                [ hero page
+                , RoomListing.view model |> Html.map RoomListingMsg
+                ]
 
-        RoomCreate ->
-            RoomCreate.view model.roomCreate |> Html.map RoomCreateMsg
+        RoomCreate model ->
+            div []
+                [ hero page
+                , RoomCreate.view model |> Html.map RoomCreateMsg
+                ]
 
         _ ->
             text "not found"
+
+
+loading : Bool -> Html Msg
+loading isLoading =
+    div
+        [ classList
+            [ ( "is-inactive", not isLoading )
+            , ( "loading", True )
+            , ( "has-background-info", True )
+            ]
+        ]
+        [ div
+            [ class "sk-double-bounce" ]
+            [ div [ class "sk-child sk-double-bounce1" ] []
+            , div [ class "sk-child sk-double-bounce2" ] []
+            ]
+        ]

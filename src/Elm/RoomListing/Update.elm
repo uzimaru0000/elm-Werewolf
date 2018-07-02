@@ -13,17 +13,8 @@ update msg model =
         ListRequest ->
             model ! [ listRequest () ]
 
-        GetList value ->
-            let
-                newList =
-                    Json.decodeValue (Json.list roomDecoder) value
-            in
-                case newList of
-                    Ok list ->
-                        { model | roomList = list, isLoading = Just False } ! [ usersRequest () ]
-
-                    Err _ ->
-                        model ! []
+        GetList list ->
+            { model | roomList = list, isLoading = Just False } ! [ usersRequest () ]
 
         GetUserList list ->
             let

@@ -10,7 +10,7 @@ import Rule exposing (..)
 view : Model -> Html Msg
 view model =
     div
-        []
+        [ class "container" ]
         [ forms model
         ]
 

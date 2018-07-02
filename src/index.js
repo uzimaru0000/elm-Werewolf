@@ -2,6 +2,8 @@
 
 import './index.html';
 import 'bulma/css/bulma.css';
+import 'spinkit/css/spinners/2-double-bounce.css';
+import './style.css';
 
 // firebase setting
 import firebase from 'firebase/app';
@@ -36,6 +38,7 @@ auth.onAuthStateChanged(user => {
 
 // Elm Embed
 import { Main } from './Elm/Main.elm';
+import { rejects } from 'assert';
 const app = Main.fullscreen();
 
 // login request
@@ -46,6 +49,33 @@ app.ports.login.subscribe(_ => {
 // logout request
 app.ports.logout.subscribe(_ => {
     if (auth.currentUser) auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
+});
+
+// roomListingInit
+app.ports.roomListInit.subscribe(_ => {
+
+    db.ref('room').once('value').then(ss => {
+        const roomList = [];
+        ss.forEach(x => {
+            roomList.push(newRoom(x));
+        });
+        return roomList;
+    }).then(list => {
+        db.ref('users').once('value').then(ss => {
+            const userList = [];
+            ss.forEach(x => {
+                const user = x.val();
+                user.uid = x.key;
+                userList.push(user);
+            });
+
+            app.ports.getRoomListDate.send({
+                listValue: list,
+                userList: userList
+            });
+        });
+    });
+
 });
 
 // create room

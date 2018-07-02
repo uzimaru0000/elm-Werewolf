@@ -23,6 +23,7 @@
   "dependencies": {
     "bulma": "^0.7.1",
     "dotenv": "^6.0.0",
-    "firebase": "^5.0.4"
+    "firebase": "^5.0.4",
+    "spinkit": "^1.2.5"
   }
 }

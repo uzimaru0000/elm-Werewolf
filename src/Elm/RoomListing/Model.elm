@@ -5,6 +5,7 @@ import User exposing (..)
 import Rule exposing (..)
 import Dict exposing (..)
 import Json.Decode as JD
+import Firebase exposing (..)
 
 
 type alias Model =
@@ -18,17 +19,17 @@ type alias Model =
 
 type Msg
     = ListRequest
-    | GetList JD.Value
+    | GetList (List Room)
     | LoadStart ()
     | GetUserList (List User)
     | InputRoomName String
     | CheckRule Rule
 
 
-init : Model
-init =
-    { roomList = []
-    , userDict = Dict.empty
+init : List Room -> Dict String User -> Model
+init roomList userDict =
+    { roomList = roomList
+    , userDict = userDict
     , isLoading = Nothing
     , serchRoomName = Nothing
     , checkedRules = []
