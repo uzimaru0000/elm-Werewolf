@@ -29,6 +29,9 @@ setRoute route model =
             Routing.NotFound ->
                 { model | pageState = Loaded NotFound } ! []
 
+            Routing.Login ->
+                model ! []
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =

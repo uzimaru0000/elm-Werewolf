@@ -7,6 +7,7 @@ import UrlParser exposing (..)
 type Route
     = RoomListing
     | RoomCreate
+    | Login
     | NotFound
 
 
@@ -16,6 +17,7 @@ matchers =
         [ map RoomListing top
         , map RoomListing (s "listing")
         , map RoomCreate (s "create")
+        , map Login (s "login")
         ]
 
 
@@ -36,6 +38,9 @@ routeToUrl route =
         
         RoomCreate ->
             "#create"
+
+        Login ->
+            "#login"
 
         NotFound ->
             "#notfound"

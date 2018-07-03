@@ -20,7 +20,11 @@ firebase.initializeApp({
 
 const auth = firebase.auth();
 const db = firebase.database();
-const provider = new firebase.auth.TwitterAuthProvider();
+const providers = {
+    Twitter: new firebase.auth.TwitterAuthProvider(),
+    Google: new firebase.auth.GoogleAuthProvider(),
+    GitHub: new firebase.auth.GithubAuthProvider()
+};
 auth.languageCode = 'jp';
 auth.getRedirectResult();
 auth.onAuthStateChanged(user => {
@@ -29,7 +33,7 @@ auth.onAuthStateChanged(user => {
         const userData = {
             uid: user.uid,
             name: user.displayName,
-            iconUrl: user.photoURL
+            iconUrl: user.photoURL || null
         };
         app.ports.loginSuccess.send(userData);
         db.ref(`users/${user.uid}`).set({ name: userData.name, iconUrl: userData.iconUrl });
@@ -42,13 +46,17 @@ import { rejects } from 'assert';
 const app = Main.fullscreen();
 
 // login request
-app.ports.login.subscribe(_ => {
-    if (!auth.currentUser) auth.signInWithRedirect(provider);
+app.ports.login.subscribe(type => {
+    if (!auth.currentUser) {
+        auth.signInWithRedirect(providers[type]);
+    }
 });
 
 // logout request
 app.ports.logout.subscribe(_ => {
-    if (auth.currentUser) auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
+    if (auth.currentUser) {
+        auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
+    }
 });
 
 // roomListingInit
@@ -129,6 +137,7 @@ app.ports.usersRequest.subscribe(_ => {
         ss.forEach(x => {
             const user = x.val();
             user.uid = x.key;
+            user.iconUrl = user.iconUrl || null;
             userList.push(user);
         });
         app.ports.getUsers.send(userList);

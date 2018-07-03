@@ -11,7 +11,7 @@ type alias RoomListInitDate =
     }
     
 
-port login : () -> Cmd msg
+port login : String -> Cmd msg
 port logout : () -> Cmd msg
 port createRoom : Json.Encode.Value -> Cmd msg
 port listRequest : () -> Cmd msg

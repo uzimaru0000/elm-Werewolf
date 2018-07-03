@@ -118,8 +118,68 @@ page page =
                 , RoomCreate.view model |> Html.map RoomCreateMsg
                 ]
 
+        Login model ->
+            div []
+                [ Auth.view model |> Html.map AuthMsg
+                ]
+
         _ ->
             text "not found"
+
+navbar : Model -> Html Msg
+navbar model =
+    nav
+        [ class "navbar is-fixed-top"
+        ]
+        [ div [ class "navbar-brand" ]
+            [ div [ class "navbar-item" ] [ text "WereWolf Online" ]
+            , div
+                [ class "navbar-burger"
+                , classList [ ( "is-active", False ) ]
+                ]
+                [ span [] []
+                , span [] []
+                , span [] []
+                ]
+            ]
+        , div
+            [ class "navbar-menu"
+            , classList [ ( "is-active", False ) ]
+            ]
+            [ navbarEnd model ]
+        ]
+
+
+navbarEnd : Model -> Html Msg
+navbarEnd { user } =
+    div [ class "navbar-end" ]
+        [ case user of
+            Just user ->
+                div
+                    [ class "navbar-item has-dropdown"
+                    , classList [ ( "is-active", False ) ]
+                    ]
+                    [ div
+                        [ class "navbar-link is-dark is-hidden-touch"
+                        ]
+                        [ img
+                            [ user.iconUrl |> Maybe.withDefault "" |> src
+                            , style [ ( "border-radius", "50%" ) ]
+                            ]
+                            []
+                        ]
+                    , div
+                        [ class "navbar-dropdown" ]
+                        [ a
+                            [ class "navbar-item  has-text-danger"
+                            ]
+                            [ text "logout" ]
+                        ]
+                    ]
+
+            Nothing ->
+                text ""
+        ]
 
 
 loading : Bool -> Html Msg
