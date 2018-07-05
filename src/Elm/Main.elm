@@ -1,10 +1,9 @@
 module Main exposing (..)
 
-import Html exposing (program)
 import Model exposing (..)
+import User exposing (User)
 import View exposing (..)
 import Update exposing (..)
-import Auth.Sub as Auth exposing (..)
 import RoomCreate.Sub as RoomCreate exposing (..)
 import RoomListing.Sub as RoomListing exposing (..)
 import Firebase exposing (..)
@@ -13,9 +12,9 @@ import Routing exposing (Route)
 import Firebase exposing (..)
 
 
-locateInit : Location -> ( Model, Cmd Msg )
-locateInit loc =
-    setRoute (Routing.parseLocation loc) init
+locateInit : Maybe User -> Location -> ( Model, Cmd Msg )
+locateInit user loc =
+    setRoute (Routing.parseLocation loc) { init | user = user }
 
 
 pageSubscriptions : Page -> Sub Msg
@@ -27,8 +26,8 @@ pageSubscriptions page =
         NotFound ->
             Sub.none
 
-        Login model ->
-            Auth.subscriptions model |> Sub.map AuthMsg
+        Login ->
+            Sub.none
 
         RoomListing model ->
             RoomListing.subscriptions model |> Sub.map RoomListingMsg
@@ -46,9 +45,9 @@ subscriptions model =
         |> Sub.batch
 
 
-main : Program Never Model Msg
+main : Program (Maybe User) Model Msg
 main =
-    Navigation.program LocationChange
+    Navigation.programWithFlags LocationChange
         { init = locateInit
         , view = view
         , update = update

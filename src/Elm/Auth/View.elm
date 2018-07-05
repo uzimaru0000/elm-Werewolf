@@ -6,12 +6,15 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
 
-view : Model -> Html Msg
-view model =
+view : Html Msg
+view =
     div [ class "columns is-centered" ]
         [ div
-            [ class "column box is-half" ]
-            [ figure
+            [ class "column" ]
+            [ div
+                [ class "has-text-centered title is-1" ]
+                [ text "Sign in" ]
+            , figure
                 [ class "image is-128x128"
                 , style
                     [ ( "margin", "16px auto 32px" )
@@ -31,8 +34,9 @@ view model =
                 [ div
                     [ class "control" ]
                     [ button
-                        [ class "button is-medium is-info"
+                        [ class "button is-large is-info"
                         , onClick <| Login Twitter
+                        , style btnStyle
                         ]
                         [ span [ class "icon" ]
                             [ i [ class "fab fa-twitter" ] [] ]
@@ -45,8 +49,9 @@ view model =
                 [ div
                     [ class "control" ]
                     [ button
-                        [ class "button is-medium"
+                        [ class "button is-large"
                         , onClick <| Login Google
+                        , style btnStyle
                         ]
                         [ span [ class "icon has-text-link" ]
                             [ i [ class "fab fa-google" ] [] ]
@@ -59,8 +64,9 @@ view model =
                 [ div
                     [ class "control" ]
                     [ button
-                        [ class "button is-medium is-black"
+                        [ class "button is-large is-black"
                         , onClick <| Login GitHub
+                        , style btnStyle
                         ]
                         [ span [ class "icon" ]
                             [ i [ class "fab fa-github" ] [] ]
@@ -70,3 +76,9 @@ view model =
                 ]
             ]
         ]
+
+btnStyle : List (String, String)
+btnStyle =
+    [ ( "padding", "0 128px" )
+    , ( "margin-bottom", "16px" )
+    ]

@@ -7,6 +7,7 @@ import Json.Decode as Json
 import Dict
 import Room exposing (..)
 import Firebase exposing (..)
+import Auth.Cmd as Auth
 import RoomListing.Model as RoomListing
 import RoomCreate.Model as RoomCreate
 
@@ -30,47 +31,38 @@ setRoute route model =
                 { model | pageState = Loaded NotFound } ! []
 
             Routing.Login ->
-                model ! []
+                { model | pageState = Loaded Login } ! []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        LocationChange loc ->
+    updatePage (getPage model.pageState) msg model
+
+
+updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
+updatePage page msg model =
+    case ( msg, page ) of
+        ( LocationChange loc, _ ) ->
             setRoute (parseLocation loc) model
 
-        RouteChange route ->
+        ( RouteChange route, _ ) ->
             model ! [ Navigation.newUrl <| routeToUrl route ]
 
-        -- AuthMsg msg ->
-        --     let
-        --         ( auth, cmd ) =
-        --             Auth.update msg model.auth
-        --     in
-        --         ( { model | auth = auth }, Cmd.map AuthMsg cmd )
-        -- RoomCreateMsg msg ->
-        --     let
-        --         ( roomCreate, cmd ) =
-        --             RoomCreate.update msg model.roomCreate
-        --     in
-        --         ( { model | roomCreate = roomCreate }, Cmd.map RoomCreateMsg cmd )
-        -- RoomListingMsg msg ->
-        --     let
-        --         ( roomListing, cmd ) =
-        --             RoomListing.update msg
-        --     in 
-        RoomListingInit initDate ->
+        ( RoomListingInit initData, _ ) ->
             let
                 list =
-                    initDate.listValue
+                    initData.listValue
                         |> Json.decodeValue (Json.list roomDecoder)
                         |> Result.withDefault []
 
                 users =
-                    initDate.userList
+                    initData.userList
                         |> List.foldl (\x acc -> Dict.insert x.uid x acc) Dict.empty
             in
                 { model | pageState = Loaded (RoomListing <| RoomListing.init list users) } ! []
+
+        ( AuthMsg msg, _ ) ->
+            (model, Auth.cmd msg)
 
         _ ->
             model ! []

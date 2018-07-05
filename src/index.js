@@ -5,6 +5,8 @@ import 'bulma/css/bulma.css';
 import 'spinkit/css/spinners/2-double-bounce.css';
 import './style.css';
 
+import { Main } from './Elm/Main.elm';
+
 // firebase setting
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -28,82 +30,21 @@ const providers = {
 auth.languageCode = 'jp';
 auth.getRedirectResult();
 auth.onAuthStateChanged(user => {
-    app.ports.authStateCheck.send(null);
-    if (user) {
-        const userData = {
-            uid: user.uid,
-            name: user.displayName,
-            iconUrl: user.photoURL || null
-        };
-        app.ports.loginSuccess.send(userData);
-        db.ref(`users/${user.uid}`).set({ name: userData.name, iconUrl: userData.iconUrl });
-    }
+    const app = Main.fullscreen(user ? createUser(user) : null);
+    elmInit(app);
 });
 
-// Elm Embed
-import { Main } from './Elm/Main.elm';
-import { rejects } from 'assert';
-const app = Main.fullscreen();
-
-// login request
-app.ports.login.subscribe(type => {
-    if (!auth.currentUser) {
-        auth.signInWithRedirect(providers[type]);
-    }
-});
-
-// logout request
-app.ports.logout.subscribe(_ => {
-    if (auth.currentUser) {
-        auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
-    }
-});
-
-// roomListingInit
-app.ports.roomListInit.subscribe(_ => {
-
-    db.ref('room').once('value').then(ss => {
-        const roomList = [];
-        ss.forEach(x => {
-            roomList.push(newRoom(x));
-        });
-        return roomList;
-    }).then(list => {
-        db.ref('users').once('value').then(ss => {
-            const userList = [];
-            ss.forEach(x => {
-                const user = x.val();
-                user.uid = x.key;
-                userList.push(user);
-            });
-
-            app.ports.getRoomListDate.send({
-                listValue: list,
-                userList: userList
-            });
-        });
-    });
-
-});
-
-// create room
-app.ports.createRoom.subscribe(model => {
-
-    const newRoom = {
-        name: model.roomName,
-        ownerID: auth.currentUser.uid,
-        member: [auth.currentUser.uid],
-        maxNum: model.maxNum,
-        pass: model.pass,
-        ruleSet: model.ruleSet
+// Creater
+const createUser = user => {
+    const userData = {
+        uid: user.uid,
+        name: user.displayName,
+        iconUrl: user.photoURL || null
     };
+    db.ref(`users/${user.uid}`).set({ name: userData.name, iconUrl: userData.iconUrl });
+    return userData;
+};
 
-    db.ref('room')
-        .push(newRoom)
-        .then(_ => app.ports.createRoomSuccess.send(null));
-});
-
-// getList request
 const newRoom = ss => {
     return {
         uid: ss.key,
@@ -116,30 +57,72 @@ const newRoom = ss => {
     };
 };
 
-const sendRoomList = ss => {
-    const roomList = [];
-    ss.forEach(x => {
-        roomList.push(newRoom(x));
+// ElmInit
+const elmInit = app => {
+
+    // login request
+    app.ports.login.subscribe(type => {
+        if (!auth.currentUser) {
+            auth.signInWithRedirect(providers[type]);
+        }
     });
-    app.ports.getRoomList.send(roomList);
-}
 
-app.ports.listRequest.subscribe(_ => {
-    app.ports.loadingStart.send(null);
-    db.ref('room').once('value').then(ss => sendRoomList(ss));
-});
+    // logout request
+    app.ports.logout.subscribe(_ => {
+        if (auth.currentUser) {
+            auth.signOut().then(_ => app.ports.logoutSuccess.send(null));
+        }
+    });
 
-db.ref('room').on('value', ss => sendRoomList(ss));
+    // roomListingInit
+    app.ports.roomListInit.subscribe(_ => {
+        db.ref('room').once('value').then(ss => {
+            const roomList = [];
+            ss.forEach(x => {
+                roomList.push(newRoom(x));
+            });
+            return roomList;
+        }).then(list => {
+            db.ref('users').once('value').then(ss => {
+                const userList = [];
+                ss.forEach(x => {
+                    const user = x.val();
+                    user.uid = x.key;
+                    userList.push(user);
+                });
 
-app.ports.usersRequest.subscribe(_ => {
-    db.ref('users').once('value').then(ss => {
-        const userList = [];
-        ss.forEach(x => {
-            const user = x.val();
-            user.uid = x.key;
-            user.iconUrl = user.iconUrl || null;
-            userList.push(user);
+                app.ports.getRoomListDate.send({
+                    listValue: list,
+                    userList: userList
+                });
+            });
         });
-        app.ports.getUsers.send(userList);
     });
-});
+
+    // create room
+    app.ports.createRoom.subscribe(model => {
+        const newRoom = {
+            name: model.roomName,
+            ownerID: auth.currentUser.uid,
+            member: [auth.currentUser.uid],
+            maxNum: model.maxNum,
+            pass: model.pass,
+            ruleSet: model.ruleSet
+        };
+
+        db.ref('room')
+            .push(newRoom)
+            .then(_ => app.ports.createRoomSuccess.send(null));
+    });
+
+    // getList request
+    const sendRoomList = ss => {
+        const roomList = [];
+        ss.forEach(x => {
+            roomList.push(newRoom(x));
+        });
+        app.ports.getRoomList.send(roomList);
+    }
+
+    db.ref('room').on('value', ss => sendRoomList(ss));
+};

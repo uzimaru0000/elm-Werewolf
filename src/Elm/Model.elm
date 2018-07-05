@@ -13,7 +13,7 @@ import Firebase exposing (..)
 type Page
     = Blank
     | NotFound
-    | Login Auth.Model
+    | Login
     | RoomCreate RoomCreate.Model
     | RoomListing RoomListing.Model
 
@@ -37,6 +37,7 @@ type Msg
     | RoomCreateMsg RoomCreate.Msg
     | RoomListingMsg RoomListing.Msg
     | RoomListingInit RoomListInitDate
+    | LogoutSuccess
 
 
 init : Model

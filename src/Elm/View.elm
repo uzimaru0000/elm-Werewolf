@@ -1,6 +1,7 @@
 module View exposing (..)
 
 import Model exposing (..)
+import User exposing (..)
 import Routing exposing (Route)
 import Auth.View as Auth exposing (..)
 import RoomCreate.View as RoomCreate exposing (..)
@@ -15,18 +16,18 @@ view : Model -> Html Msg
 view model =
     case model.pageState of
         Loaded page ->
-            frame page False
+            frame model.user page False
 
         Transition page ->
-            frame page True
+            frame model.user page True
 
 
-frame : Page -> Bool -> Html Msg
-frame currentPage isLoading =
+frame : Maybe User -> Page -> Bool -> Html Msg
+frame user currentPage isLoading =
     div
         []
-        [ loading (isLoading |> Debug.log "")
-        , page currentPage
+        [ loading isLoading
+        , page user currentPage
         ]
 
 
@@ -103,33 +104,37 @@ hero page =
             ]
 
 
-page : Page -> Html Msg
-page page =
+page : Maybe User -> Page -> Html Msg
+page user page =
     case page of
         RoomListing model ->
             div []
-                [ hero page
+                [ navbar user
+                , hero page
                 , RoomListing.view model |> Html.map RoomListingMsg
                 ]
 
         RoomCreate model ->
             div []
-                [ hero page
+                [ navbar user
+                , hero page
                 , RoomCreate.view model |> Html.map RoomCreateMsg
                 ]
 
-        Login model ->
+        Login ->
             div []
-                [ Auth.view model |> Html.map AuthMsg
+                [ navbar user
+                , Auth.view |> Html.map AuthMsg
                 ]
 
         _ ->
             text "not found"
 
-navbar : Model -> Html Msg
-navbar model =
+
+navbar : Maybe User -> Html Msg
+navbar user =
     nav
-        [ class "navbar is-fixed-top"
+        [ class "navbar"
         ]
         [ div [ class "navbar-brand" ]
             [ div [ class "navbar-item" ] [ text "WereWolf Online" ]
@@ -146,12 +151,12 @@ navbar model =
             [ class "navbar-menu"
             , classList [ ( "is-active", False ) ]
             ]
-            [ navbarEnd model ]
+            [ navbarEnd user ]
         ]
 
 
-navbarEnd : Model -> Html Msg
-navbarEnd { user } =
+navbarEnd : Maybe User -> Html Msg
+navbarEnd user =
     div [ class "navbar-end" ]
         [ case user of
             Just user ->
@@ -178,7 +183,20 @@ navbarEnd { user } =
                     ]
 
             Nothing ->
-                text ""
+                div
+                    [ class "navbar-item" ]
+                    [ div
+                        [ class "field is-grouped" ]
+                        [ div
+                            [ class "control" ]
+                            [ div
+                                [ class "button"
+                                , onClick <| RouteChange Routing.Login
+                                ]
+                                [ text "Login / Signin" ]
+                            ]
+                        ]
+                    ]
         ]
 
 
