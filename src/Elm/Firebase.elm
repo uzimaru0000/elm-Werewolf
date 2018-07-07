@@ -19,9 +19,7 @@ port usersRequest : () -> Cmd msg
 
 port roomListInit : () -> Cmd msg
 
-port loginSuccess : (User -> msg) -> Sub msg
 port logoutSuccess : (() -> msg) -> Sub msg
-port authStateCheck : (() -> msg) -> Sub msg
 port getRoomList : (Json.Decode.Value -> msg) -> Sub msg
 port createRoomSuccess : (() -> msg) -> Sub msg
 port loadingStart : (() -> msg) -> Sub msg

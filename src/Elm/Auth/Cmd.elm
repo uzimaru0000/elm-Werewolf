@@ -9,6 +9,3 @@ cmd msg =
     case msg of
         Login loginType ->
             login <| toString loginType
-
-        Logout ->
-            logout ()

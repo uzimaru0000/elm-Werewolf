@@ -16,17 +16,18 @@ view : Model -> Html Msg
 view model =
     case model.pageState of
         Loaded page ->
-            frame model.user page False
+            frame model.user page False model.menuState
 
         Transition page ->
-            frame model.user page True
+            frame model.user page True model.menuState
 
 
-frame : Maybe User -> Page -> Bool -> Html Msg
-frame user currentPage isLoading =
+frame : Maybe User -> Page -> Bool -> Bool -> Html Msg
+frame user currentPage isLoading isActive =
     div
         []
         [ loading isLoading
+        , navbar isActive user
         , page user currentPage
         ]
 
@@ -109,30 +110,27 @@ page user page =
     case page of
         RoomListing model ->
             div []
-                [ navbar user
-                , hero page
+                [ hero page
                 , RoomListing.view model |> Html.map RoomListingMsg
                 ]
 
         RoomCreate model ->
             div []
-                [ navbar user
-                , hero page
+                [ hero page
                 , RoomCreate.view model |> Html.map RoomCreateMsg
                 ]
 
         Login ->
             div []
-                [ navbar user
-                , Auth.view |> Html.map AuthMsg
+                [ Auth.view |> Html.map AuthMsg
                 ]
 
         _ ->
             text "not found"
 
 
-navbar : Maybe User -> Html Msg
-navbar user =
+navbar : Bool -> Maybe User -> Html Msg
+navbar isActive user =
     nav
         [ class "navbar"
         ]
@@ -140,7 +138,8 @@ navbar user =
             [ div [ class "navbar-item" ] [ text "WereWolf Online" ]
             , div
                 [ class "navbar-burger"
-                , classList [ ( "is-active", False ) ]
+                , classList [ ( "is-active", isActive ) ]
+                , onClick MenuClick
                 ]
                 [ span [] []
                 , span [] []
@@ -149,7 +148,7 @@ navbar user =
             ]
         , div
             [ class "navbar-menu"
-            , classList [ ( "is-active", False ) ]
+            , classList [ ( "is-active", isActive ) ]
             ]
             [ navbarEnd user ]
         ]
@@ -157,47 +156,55 @@ navbar user =
 
 navbarEnd : Maybe User -> Html Msg
 navbarEnd user =
-    div [ class "navbar-end" ]
-        [ case user of
-            Just user ->
-                div
-                    [ class "navbar-item has-dropdown"
-                    , classList [ ( "is-active", False ) ]
-                    ]
+    case user of
+        Just user ->
+            div [ class "navbar-end" ]
+                [ div
+                    [ class "navbar-item" ]
                     [ div
-                        [ class "navbar-link is-dark is-hidden-touch"
-                        ]
-                        [ img
-                            [ user.iconUrl |> Maybe.withDefault "" |> src
-                            , style [ ( "border-radius", "50%" ) ]
+                        [ class "field is-grouped" ]
+                        [ div
+                            [ class "control" ]
+                            [ div [ class "button is-white" ]
+                                [ img
+                                    [ user.iconUrl |> Maybe.withDefault "" |> src
+                                    , style
+                                        [ ( "border-radius", "50%" ) ]
+                                    ]
+                                    []
+                                , span [] [ text user.name ]
+                                ]
                             ]
-                            []
-                        ]
-                    , div
-                        [ class "navbar-dropdown" ]
-                        [ a
-                            [ class "navbar-item  has-text-danger"
+                        , div
+                            [ class "control" ]
+                            [ div
+                                [ class "button is-white"
+                                , onClick Logout
+                                ]
+                                [ text "SignOut"
+                                ]
                             ]
-                            [ text "logout" ]
                         ]
                     ]
+                ]
 
-            Nothing ->
-                div
+        Nothing ->
+            div [ class "navbar-end" ]
+                [ div
                     [ class "navbar-item" ]
                     [ div
                         [ class "field is-grouped" ]
                         [ div
                             [ class "control" ]
                             [ div
-                                [ class "button"
+                                [ class "button is-white"
                                 , onClick <| RouteChange Routing.Login
                                 ]
-                                [ text "Login / Signin" ]
+                                [ text "SignUp / SignIn" ]
                             ]
                         ]
                     ]
-        ]
+                ]
 
 
 loading : Bool -> Html Msg

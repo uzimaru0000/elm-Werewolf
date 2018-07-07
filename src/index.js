@@ -29,10 +29,16 @@ const providers = {
 };
 auth.languageCode = 'jp';
 auth.getRedirectResult();
-auth.onAuthStateChanged(user => {
-    const app = Main.fullscreen(user ? createUser(user) : null);
-    elmInit(app);
-});
+auth.onAuthStateChanged((() => {
+    let flag = false;
+    return user => {
+        if (!flag) {
+            const app = Main.fullscreen(user ? createUser(user) : null);
+            elmInit(app);
+            flag = true;
+        }
+    }
+})());
 
 // Creater
 const createUser = user => {

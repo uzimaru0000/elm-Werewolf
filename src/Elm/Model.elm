@@ -26,6 +26,7 @@ type PageState
 type alias Model =
     { pageState : PageState
     , user : Maybe User
+    , menuState : Bool
     }
 
 
@@ -37,7 +38,9 @@ type Msg
     | RoomCreateMsg RoomCreate.Msg
     | RoomListingMsg RoomListing.Msg
     | RoomListingInit RoomListInitDate
-    | LogoutSuccess
+    | Logout
+    | LogoutSuccess ()
+    | MenuClick
 
 
 init : Model
@@ -45,6 +48,7 @@ init =
     Model
         (Loaded Blank)
         Nothing
+        False
 
 
 getPage : PageState -> Page
@@ -62,7 +66,7 @@ pageToRoute page =
     case page of
         RoomCreate _ ->
             Routing.RoomCreate
-        
+
         RoomListing _ ->
             Routing.RoomListing
 

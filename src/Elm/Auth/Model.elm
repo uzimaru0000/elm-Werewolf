@@ -7,4 +7,3 @@ type LoginType
 
 type Msg
     = Login LoginType
-    | Logout

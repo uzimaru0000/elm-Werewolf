@@ -9,7 +9,9 @@ import Room exposing (..)
 import Firebase exposing (..)
 import Auth.Cmd as Auth
 import RoomListing.Model as RoomListing
+import RoomListing.Update as RoomListing
 import RoomCreate.Model as RoomCreate
+import RoomCreate.Update as RoomCreate
 
 
 setRoute : Route -> Model -> ( Model, Cmd Msg )
@@ -61,8 +63,31 @@ updatePage page msg model =
             in
                 { model | pageState = Loaded (RoomListing <| RoomListing.init list users) } ! []
 
+        ( RoomListingMsg subMsg, RoomListing oldModel ) ->
+            let
+                ( subModel, subCmd ) =
+                    RoomListing.update subMsg oldModel
+            in
+                { model | pageState = Loaded (RoomListing subModel) } ! [ Cmd.map RoomListingMsg subCmd ]
+
+        ( RoomCreateMsg subMsg, RoomCreate oldModel ) ->
+            let
+                ( subModel, subCmd ) =
+                    RoomCreate.update subMsg oldModel
+            in
+                { model | pageState = Loaded (RoomCreate subModel) } ! [ Cmd.map RoomCreateMsg subCmd ]
+
         ( AuthMsg msg, _ ) ->
-            (model, Auth.cmd msg)
+            ( model, Auth.cmd msg )
+
+        ( Logout, _ ) ->
+            model ! [ logout () ]
+
+        ( LogoutSuccess _, _ ) ->
+            { model | user = Nothing } ! []
+
+        ( MenuClick, _ ) ->
+            { model | menuState = not model.menuState } ! []
 
         _ ->
             model ! []

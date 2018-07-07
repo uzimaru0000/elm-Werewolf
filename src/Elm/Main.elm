@@ -41,6 +41,7 @@ subscriptions model =
     [ getPage model.pageState
         |> pageSubscriptions
     , getRoomListDate RoomListingInit
+    , logoutSuccess LogoutSuccess
     ]
         |> Sub.batch
 
