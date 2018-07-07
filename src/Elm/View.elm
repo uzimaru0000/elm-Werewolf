@@ -4,9 +4,9 @@ import Model exposing (..)
 import User exposing (..)
 import Routing exposing (Route)
 import Auth.View as Auth exposing (..)
-import RoomCreate.View as RoomCreate exposing (..)
-import RoomListing.View as RoomListing exposing (..)
-import RoomCreate.Model as RoomCreate
+import RoomCreate.View as RoomCreate
+import RoomListing.View as RoomListing
+import Home.View as Home
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -34,7 +34,8 @@ frame user currentPage isLoading isActive =
 
 locateTab : Route -> Html Msg
 locateTab route =
-    [ Routing.RoomListing
+    [ Routing.Home
+    , Routing.RoomListing
     , Routing.RoomCreate
     ]
         |> List.map (\x -> ( x, locateString x ))
@@ -60,12 +61,15 @@ locateString route =
         Routing.RoomCreate ->
             "Create"
 
+        Routing.Home ->
+            "Home"
+
         _ ->
             ""
 
 
-hero : Page -> Html Msg
-hero page =
+hero : Page -> Bool -> Html Msg
+hero page isFooter =
     let
         titles =
             case page of
@@ -74,6 +78,9 @@ hero page =
 
                 RoomCreate _ ->
                     ( "Createing Room", "ルームを作成します" )
+
+                Home ->
+                    ( "Home", "Welcome to WereWolf" )
 
                 _ ->
                     ( "NotFound", "存在しないページです" )
@@ -92,16 +99,19 @@ hero page =
                         [ text <| Tuple.second titles ]
                     ]
                 ]
-            , div
-                [ class "hero-foot" ]
-                [ nav
-                    [ class "tabs is-boxed is-fullwidth" ]
-                    [ div
-                        [ class "container" ]
-                        [ locateTab <| pageToRoute page
+            , if isFooter then
+                div
+                    [ class "hero-foot" ]
+                    [ nav
+                        [ class "tabs is-boxed is-fullwidth" ]
+                        [ div
+                            [ class "container" ]
+                            [ locateTab <| pageToRoute page
+                            ]
                         ]
                     ]
-                ]
+              else
+                text ""
             ]
 
 
@@ -110,19 +120,25 @@ page user page =
     case page of
         RoomListing model ->
             div []
-                [ hero page
+                [ hero page True
                 , RoomListing.view model |> Html.map RoomListingMsg
                 ]
 
         RoomCreate model ->
             div []
-                [ hero page
+                [ hero page True
                 , RoomCreate.view model |> Html.map RoomCreateMsg
                 ]
 
         Login ->
             div []
                 [ Auth.view |> Html.map AuthMsg
+                ]
+
+        Home ->
+            div []
+                [ hero page <| user /= Nothing
+                , Home.view
                 ]
 
         _ ->
@@ -135,7 +151,11 @@ navbar isActive user =
         [ class "navbar"
         ]
         [ div [ class "navbar-brand" ]
-            [ div [ class "navbar-item" ] [ text "WereWolf Online" ]
+            [ a
+                [ class "navbar-item"
+                , onClick <| RouteChange Routing.Home
+                ]
+                [ text "WereWolf Online" ]
             , div
                 [ class "navbar-burger"
                 , classList [ ( "is-active", isActive ) ]

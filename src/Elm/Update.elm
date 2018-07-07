@@ -35,6 +35,9 @@ setRoute route model =
             Routing.Login ->
                 { model | pageState = Loaded Login } ! []
 
+            Routing.Home ->
+                { model | pageState = Loaded Home } ! []
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =

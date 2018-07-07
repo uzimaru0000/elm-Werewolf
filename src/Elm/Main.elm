@@ -20,20 +20,14 @@ locateInit user loc =
 pageSubscriptions : Page -> Sub Msg
 pageSubscriptions page =
     case page of
-        Blank ->
-            Sub.none
-
-        NotFound ->
-            Sub.none
-
-        Login ->
-            Sub.none
-
         RoomListing model ->
             RoomListing.subscriptions model |> Sub.map RoomListingMsg
 
         RoomCreate model ->
             RoomCreate.subscriptions model |> Sub.map RoomCreateMsg
+
+        _ ->
+            Sub.none
 
 
 subscriptions : Model -> Sub Msg

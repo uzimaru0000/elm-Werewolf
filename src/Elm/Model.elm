@@ -6,7 +6,6 @@ import RoomListing.Model as RoomListing
 import Routing exposing (..)
 import Navigation exposing (Location)
 import User exposing (User)
-import Room exposing (Room)
 import Firebase exposing (..)
 
 
@@ -14,6 +13,7 @@ type Page
     = Blank
     | NotFound
     | Login
+    | Home
     | RoomCreate RoomCreate.Model
     | RoomListing RoomListing.Model
 
