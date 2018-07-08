@@ -6,5 +6,8 @@ import Html.Attributes exposing (..)
 view : Html msg
 view =
     div
-        [ class "title" ]
-        [ text "Welcome to WereWolfOnline" ]
+        [ class "container" ]
+        [ div
+            [ class "title" ]
+            [ text "This is home." ]
+        ]

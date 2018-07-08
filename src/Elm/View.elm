@@ -34,8 +34,7 @@ frame user currentPage isLoading isActive =
 
 locateTab : Route -> Html Msg
 locateTab route =
-    [ Routing.Home
-    , Routing.RoomListing
+    [ Routing.RoomListing
     , Routing.RoomCreate
     ]
         |> List.map (\x -> ( x, locateString x ))
@@ -68,8 +67,8 @@ locateString route =
             ""
 
 
-hero : Page -> Bool -> Html Msg
-hero page isFooter =
+hero : Page -> Html Msg
+hero page =
     let
         titles =
             case page of
@@ -99,19 +98,16 @@ hero page isFooter =
                         [ text <| Tuple.second titles ]
                     ]
                 ]
-            , if isFooter then
-                div
-                    [ class "hero-foot" ]
-                    [ nav
-                        [ class "tabs is-boxed is-fullwidth" ]
-                        [ div
-                            [ class "container" ]
-                            [ locateTab <| pageToRoute page
-                            ]
+            , div
+                [ class "hero-foot" ]
+                [ nav
+                    [ class "tabs is-boxed is-fullwidth" ]
+                    [ div
+                        [ class "container" ]
+                        [ locateTab <| pageToRoute page
                         ]
                     ]
-              else
-                text ""
+                ]
             ]
 
 
@@ -120,13 +116,13 @@ page user page =
     case page of
         RoomListing model ->
             div []
-                [ hero page True
+                [ hero page
                 , RoomListing.view model |> Html.map RoomListingMsg
                 ]
 
         RoomCreate model ->
             div []
-                [ hero page True
+                [ hero page
                 , RoomCreate.view model |> Html.map RoomCreateMsg
                 ]
 
@@ -137,8 +133,7 @@ page user page =
 
         Home ->
             div []
-                [ hero page <| user /= Nothing
-                , Home.view
+                [ Home.view
                 ]
 
         _ ->
