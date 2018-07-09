@@ -11,18 +11,14 @@ import Bulma.Modifiers as Bulma exposing (..)
 import Bulma.Modifiers.Typography as Bulma
 
 
-loginViewColumnsModifiers : ColumnsModifiers
-loginViewColumnsModifiers =
-    { multiline = False
-    , gap = Gap3
-    , display = DesktopAndBeyond
-    , centered = True
-    }
-
-
 view : Html Msg
 view =
-    columns loginViewColumnsModifiers
+    columns
+        { columnsModifiers
+            | gap = Gap3
+            , display = DesktopAndBeyond
+            , centered = True
+        }
         []
         [ column columnModifiers
             []
