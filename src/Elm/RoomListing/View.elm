@@ -5,7 +5,7 @@ import Room exposing (..)
 import Rule exposing (..)
 import User exposing (..)
 import RoomListing.Model exposing (..)
-import Html exposing (..)
+import Html exposing (Html, text, img, i, span)
 import Html.Attributes exposing (class, style, src)
 import Html.Events exposing (..)
 
@@ -18,10 +18,12 @@ import Bulma.Modifiers.Typography as Typo
 
 view : Model -> Html Msg
 view model =
-    container
+    section NotSpaced
         []
-        [ forms model
-        , listView model
+        [ container []
+            [forms model
+            , listView model
+            ]
         ]
 
 

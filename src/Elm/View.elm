@@ -8,8 +8,12 @@ import RoomCreate.View as RoomCreate
 import RoomListing.View as RoomListing
 import Home.View as Home
 import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html.Attributes exposing (class, classList, style, src)
 import Html.Events exposing (..)
+import Bulma.Layout exposing (..)
+import Bulma.Modifiers exposing (..)
+import Bulma.Elements exposing (..)
+import Bulma.Components exposing (..)
 
 
 view : Model -> Html Msg
@@ -32,23 +36,13 @@ frame user currentPage isLoading isActive =
         ]
 
 
-locateTab : Route -> Html Msg
+locateTab : Route -> List (Tab Msg)
 locateTab route =
     [ Routing.RoomListing
     , Routing.RoomCreate
     ]
         |> List.map (\x -> ( x, locateString x ))
-        |> List.map
-            (\( r, str ) ->
-                li
-                    [ classList [ ( "is-active", r == route ) ]
-                    ]
-                    [ a
-                        [ onClick <| RouteChange r ]
-                        [ text str ]
-                    ]
-            )
-        |> ul []
+        |> List.map (\( r, str ) -> tab (r == route) [] [ onClick <| RouteChange r ] [ text str ])
 
 
 locateString : Route -> String
@@ -67,10 +61,10 @@ locateString route =
             ""
 
 
-hero : Page -> Html Msg
-hero page =
+header : Page -> Html Msg
+header page =
     let
-        titles =
+        ( heroTitle, subTitle ) =
             case page of
                 RoomListing _ ->
                     ( "RoomList", "現在のすべてのルームです" )
@@ -84,28 +78,30 @@ hero page =
                 _ ->
                     ( "NotFound", "存在しないページです" )
     in
-        section
-            [ class "hero is-medium is-primary block" ]
-            [ div
-                [ class "hero-body" ]
-                [ div
-                    [ class "container" ]
-                    [ h1
-                        [ class "title" ]
-                        [ text <| Tuple.first titles ]
-                    , h2
-                        [ class "subtitle" ]
-                        [ text <| Tuple.second titles ]
+        hero
+            { heroModifiers
+                | size = Standard
+                , color = Primary
+            }
+            [ display Block ]
+            [ heroBody []
+                [ container
+                    []
+                    [ title H3 [] [ text heroTitle ]
+                    , subtitle H5 [] [ text subTitle ]
                     ]
                 ]
-            , div
-                [ class "hero-foot" ]
-                [ nav
-                    [ class "tabs is-boxed is-fullwidth" ]
-                    [ div
-                        [ class "container" ]
-                        [ locateTab <| pageToRoute page
-                        ]
+            , heroFoot []
+                [ container
+                    []
+                    [ pageToRoute page
+                        |> locateTab
+                        |> tabs
+                            { tabsModifiers
+                                | style = Boxed
+                            }
+                            [ fullWidth ]
+                            []
                     ]
                 ]
             ]
@@ -116,13 +112,13 @@ page user page =
     case page of
         RoomListing model ->
             div []
-                [ hero page
+                [ header page
                 , RoomListing.view model |> Html.map RoomListingMsg
                 ]
 
         RoomCreate model ->
             div []
-                [ hero page
+                [ header page
                 , RoomCreate.view model |> Html.map RoomCreateMsg
                 ]
 
