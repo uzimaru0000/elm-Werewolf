@@ -33,13 +33,13 @@ view model =
                     [ value <| Maybe.withDefault "" model.roomName
                     , onInput InputName
                     ]
-                    [ if model.isInputError then
-                        controlHelp Danger
-                            []
-                            [ text "RoomName must not be empty." ]
-                      else
-                        text ""
-                    ]
+                    []
+                , if model.isInputError then
+                    controlHelp Danger
+                        []
+                        [ text "RoomName must not be empty." ]
+                  else
+                    text ""
                 ]
             , field
                 []
@@ -108,7 +108,9 @@ ruleForm ( rule, n ) =
                 , iconLeft = Just ( Medium, [], i [ class <| ruleIcon rule ] [] )
             }
             []
-            [ style [ ( "width", "128px" ) ] ]
+            [ style [ ( "width", "128px" ) ]
+            , onClick <| RuleActive rule
+            ]
             [ span [] [ text <| toString rule ] ]
         , if n > 0 then
             controlInput controlInputModifiers

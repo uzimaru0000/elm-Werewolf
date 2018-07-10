@@ -70,12 +70,6 @@ update msg model =
             in
                 { model | ruleSet = newSet } ! []
 
-        Activate ->
-            { model | isActive = True } ! []
-
-        Exit ->
-            { model | isActive = False } ! []
-
         Create ->
             case model.roomName of
                 Nothing ->

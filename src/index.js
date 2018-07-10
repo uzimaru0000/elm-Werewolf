@@ -69,7 +69,8 @@ const elmInit = app => {
     // login request
     app.ports.login.subscribe(type => {
         if (!auth.currentUser) {
-            auth.signInWithRedirect(providers[type]);
+            // auth.signInWithRedirect(providers[type]);
+            auth.signInWithPopup(providers[type]);
         }
     });
 

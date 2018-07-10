@@ -10,7 +10,6 @@ type alias Model =
     , maxNum : Int
     , pass : Maybe String
     , ruleSet : List RuleSet
-    , isActive : Bool
     , isInputError : Bool
     , isSuccess : Maybe Bool
     }
@@ -22,8 +21,6 @@ type Msg
     | InputPass String
     | RuleActive Rule
     | InputRoleNum Rule String
-    | Activate
-    | Exit
     | Create
     | Success ()
 
@@ -41,7 +38,6 @@ init =
         , ( Madman, 0 )
         , ( Psychic, 0 )
         ]
-    , isActive = False
     , isInputError = False
     , isSuccess = Nothing
     }
