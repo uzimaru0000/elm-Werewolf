@@ -7,8 +7,8 @@ import Auth.View as Auth exposing (..)
 import RoomCreate.View as RoomCreate
 import RoomListing.View as RoomListing
 import Home.View as Home
-import Html exposing (Html, div, text, span, img)
-import Html.Attributes exposing (class, classList, style, src)
+import Html exposing (Html, div, text, span, img, p, a)
+import Html.Attributes exposing (class, classList, style, src, href, target)
 import Html.Events exposing (onClick)
 import Bulma.Layout exposing (..)
 import Bulma.Modifiers exposing (..)
@@ -54,9 +54,6 @@ locateString route =
 
         Routing.RoomCreate ->
             "Create"
-
-        Routing.Home ->
-            "Home"
 
         _ ->
             ""
@@ -115,6 +112,7 @@ page user page =
             div []
                 [ header page
                 , RoomListing.view model |> Html.map RoomListingMsg
+                , myFooter
                 ]
 
         RoomCreate model ->
@@ -131,6 +129,7 @@ page user page =
         Home ->
             div []
                 [ Home.view
+                , myFooter
                 ]
 
         _ ->
@@ -150,7 +149,7 @@ navigation isActive user =
                 ]
             )
             [ navbarItemLink False
-                [ onClick <| RouteChange Routing.Home ]
+                [ onClick <| RouteChange Routing.RoomListing ]
                 [ text "WereWolf Online" ]
             ]
         , navbarMenu isActive
@@ -187,6 +186,22 @@ navigationEnd maybeUser =
                     [ onClick <| RouteChange Routing.Login ]
                     [ text "SignUp / SignIn" ]
                 ]
+
+
+myFooter : Html Msg
+myFooter =
+    footer []
+        [ container []
+            [ content Small
+                [ Typo.textCentered ]
+                [ a
+                    [ href "https://github.com/uzimaru0000/elm-Werewolf"
+                    , target "_blank"
+                    ]
+                    [ text "Please give this site star." ]
+                ]
+            ]
+        ]
 
 
 loading : Bool -> Html Msg

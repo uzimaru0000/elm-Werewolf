@@ -24,7 +24,10 @@ setRoute route model =
     in
         case route of
             Routing.RoomListing ->
-                transition <| roomListInit ()
+                if model.user /= Nothing then
+                    transition <| roomListInit ()
+                else
+                    { model | pageState = Loaded Home } ! []
 
             Routing.RoomCreate ->
                 { model | pageState = Loaded (RoomCreate RoomCreate.init) } ! []
@@ -35,8 +38,6 @@ setRoute route model =
             Routing.Login ->
                 { model | pageState = Loaded Login } ! []
 
-            Routing.Home ->
-                { model | pageState = Loaded Home } ! []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -87,7 +88,7 @@ updatePage page msg model =
             model ! [ logout () ]
 
         ( LogoutSuccess _, _ ) ->
-            { model | user = Nothing } ! []
+            { model | user = Nothing, pageState = Loaded Home } ! []
 
         ( MenuClick, _ ) ->
             { model | menuState = not model.menuState } ! []

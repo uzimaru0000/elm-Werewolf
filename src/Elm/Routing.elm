@@ -8,18 +8,15 @@ type Route
     = RoomListing
     | RoomCreate
     | Login
-    | Home
     | NotFound
 
 
 matchers : Parser (Route -> a) a
 matchers =
     oneOf
-        [ map Home top
-        , map RoomListing (s "listing")
+        [ map RoomListing top
         , map RoomCreate (s "create")
         , map Login (s "login")
-        , map Home (s "home")
         ]
 
 
@@ -35,11 +32,8 @@ parseLocation loc =
 routeToUrl : Route -> String
 routeToUrl route =
     case route of
-        Home ->
-            "#home"
-        
         RoomListing ->
-            "#listing"
+            "/"
         
         RoomCreate ->
             "#create"
