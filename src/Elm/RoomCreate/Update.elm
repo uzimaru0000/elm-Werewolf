@@ -2,7 +2,7 @@ module RoomCreate.Update exposing (..)
 
 import RoomCreate.Model exposing (..)
 import Firebase exposing (..)
-import Room exposing (..)
+import Rule exposing (..)
 import Routing exposing (..)
 import Navigation exposing (..)
 
@@ -11,11 +11,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         InputName str ->
-            { model
-                | roomName = Just str
-                , isInputError = String.isEmpty str
-            }
-                ! []
+            let
+                newModel =
+                    { model | roomName = Just str }
+            in
+                { newModel | errors = errorCheck newModel } ! []
 
         InputNum str ->
             let
@@ -26,21 +26,18 @@ update msg model =
                 { model | maxNum = num } ! []
 
         InputPass str ->
-            { model
-                | pass =
-                    if String.isEmpty str then
-                        Nothing
-                    else
-                        Just str
-            }
-                ! []
+            let
+                newModel =
+                    { model | pass = Just str }
+            in
+                { newModel | errors = errorCheck newModel } ! []
 
         RuleActive rule ->
             let
                 helper t ( r, n ) =
                     if r == t then
                         if n == 0 then
-                            ( r, 1 )
+                            ( r, ruleMinNum r )
                         else
                             ( r, 0 )
                     else
@@ -49,8 +46,11 @@ update msg model =
                 newSet =
                     model.ruleSet
                         |> List.map (helper rule)
+
+                newModel =
+                    { model | ruleSet = newSet }
             in
-                { model | ruleSet = newSet } ! []
+                { newModel | errors = errorCheck newModel } ! []
 
         InputRoleNum rule str ->
             let
@@ -67,23 +67,68 @@ update msg model =
                 newSet =
                     model.ruleSet
                         |> List.map (helper rule num)
+
+                newModel =
+                    { model | ruleSet = newSet }
             in
-                { model | ruleSet = newSet } ! []
+                { newModel | errors = errorCheck newModel } ! []
 
         Create ->
-            case model.roomName of
-                Nothing ->
-                    { model | roomName = Just "", isInputError = True } ! []
-
-                Just str ->
-                    if (not << String.isEmpty) str then
-                        { model | isSuccess = Just False }
-                            ! [ model
-                                    |> modelToValue
-                                    |> createRoom
-                              ]
-                    else
-                        model ! []
+            { model | isSuccess = Just False }
+                ! [ model
+                        |> modelToValue
+                        |> createRoom
+                  ]
 
         Success _ ->
-            init ! [ Navigation.newUrl <| routeToUrl RoomListing ]
+            model ! [ Navigation.newUrl <| routeToUrl RoomListing ]
+
+
+ruleMinNum : Rule -> Int
+ruleMinNum rule =
+    case rule of
+        Villager ->
+            1
+
+        Werewolf ->
+            2
+
+        Seer ->
+            1
+
+        Hunter ->
+            1
+
+        Madman ->
+            1
+
+        Psychic ->
+            1
+
+
+errorCheck : Model -> Errors
+errorCheck { roomName, pass, ruleSet, maxNum } =
+    let
+        nameMissing =
+            case roomName of
+                Just "" ->
+                    True
+
+                _ ->
+                    False
+
+        passMissing =
+            case pass of
+                Just "" ->
+                    True
+
+                _ ->
+                    False
+
+        memberMissing =
+            ruleSet
+                |> List.map Tuple.second
+                |> List.foldl (+) 0
+                |> (/=) maxNum
+    in
+        Errors nameMissing passMissing memberMissing

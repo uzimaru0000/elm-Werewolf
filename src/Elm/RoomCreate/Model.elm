@@ -1,8 +1,14 @@
 module RoomCreate.Model exposing (..)
 
 import Rule exposing (..)
-import Set exposing (..)
 import Json.Encode as JE
+
+
+type alias Errors =
+    { nameMissing : Bool
+    , passMissing : Bool
+    , memberMissing : Bool
+    }
 
 
 type alias Model =
@@ -10,7 +16,7 @@ type alias Model =
     , maxNum : Int
     , pass : Maybe String
     , ruleSet : List RuleSet
-    , isInputError : Bool
+    , errors : Errors
     , isSuccess : Maybe Bool
     }
 
@@ -38,7 +44,7 @@ init =
         , ( Madman, 0 )
         , ( Psychic, 0 )
         ]
-    , isInputError = False
+    , errors = Errors False False False
     , isSuccess = Nothing
     }
 
@@ -60,3 +66,20 @@ modelToValue model =
             , ( "pass", helper JE.string model.pass )
             , ( "ruleSet", model.ruleSet |> List.map ruleSetEncoder |> JE.list )
             ]
+
+
+allGreen : Model -> Bool
+allGreen model =
+    [ model.errors.nameMissing
+    , model.errors.passMissing
+    , model.errors.memberMissing
+    , case model.roomName of
+        Just "" -> True
+        Nothing -> True
+        _ -> False
+    , case model.pass of
+        Just "" -> True
+        Nothing -> True
+        _ -> False
+    ]
+    |> List.any identity

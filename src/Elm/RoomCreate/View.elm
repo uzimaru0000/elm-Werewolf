@@ -23,7 +23,7 @@ view model =
                 , controlText
                     { controlInputModifiers
                         | color =
-                            if model.isInputError then
+                            if model.errors.nameMissing then
                                 Danger
                             else
                                 Default
@@ -34,10 +34,10 @@ view model =
                     , onInput InputName
                     ]
                     []
-                , if model.isInputError then
+                , if model.errors.nameMissing then
                     controlHelp Danger
                         []
-                        [ text "RoomName must not be empty." ]
+                        [ text "部屋名を入力してください。" ]
                   else
                     text ""
                 ]
@@ -46,13 +46,24 @@ view model =
                 [ controlLabel [] [ text "PassWord *" ]
                 , controlPassword
                     { controlInputModifiers
-                        | iconLeft = Just ( Small, [], i [ class "fas fa-key" ] [] )
+                        | color =
+                            if model.errors.passMissing then
+                                Danger
+                            else
+                                Default
+                        , iconLeft = Just ( Small, [], i [ class "fas fa-key" ] [] )
                     }
                     []
                     [ value <| Maybe.withDefault "" model.pass
                     , onInput InputPass
                     ]
                     []
+                , if model.errors.passMissing then
+                    controlHelp Danger
+                        []
+                        [ text "パスワードを入力してください。" ]
+                  else
+                    text ""
                 ]
             , field
                 []
@@ -75,12 +86,19 @@ view model =
                 , model.ruleSet
                     |> List.map ruleForm
                     |> control controlModifiers []
+                , if model.errors.memberMissing then
+                    controlHelp Danger
+                        []
+                        [ text <| String.join " " [ "人数を", toString model.maxNum, "人にしてください。" ] ]
+                  else
+                    text ""
                 ]
             , fields Right
                 []
                 [ controlButton
                     { buttonModifiers
                         | color = Link
+                        , static = allGreen model
                         , state =
                             model.isSuccess
                                 |> Maybe.map (\_ -> identity Loading)
