@@ -4,9 +4,11 @@ import Dict exposing (..)
 import Room exposing (..)
 import Rule exposing (..)
 import User exposing (..)
+import Routing
+import Model
 import RoomListing.Model exposing (..)
 import Html exposing (Html, text, img, i, span)
-import Html.Attributes exposing (class, style, src)
+import Html.Attributes exposing (class, style, src, href)
 import Html.Events exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Elements exposing (..)
@@ -49,7 +51,7 @@ forms model =
               ]
                 |> List.map (\x -> ( x, List.member x model.checkedRules ))
                 |> List.map ruleCheckBox
-                |> fields Left []
+                |> levelLeft []
             ]
         ]
 
@@ -64,7 +66,9 @@ listView { roomList } =
 listItem : Room -> Html Msg
 listItem room =
     box
-        [ style [ ( "padding", "16px 32px" ) ] ]
+        [ onClick <| MoveRoom room.uid
+        , style [ ( "cursor", "pointer" ) ]
+        ]
         [ media []
             [ mediaLeft []
                 [ image (OneByOne X64)
@@ -114,16 +118,20 @@ ruleTag rule =
 
 ruleCheckBox : ( Rule, Bool ) -> Html Msg
 ruleCheckBox ( rule, flag ) =
-    controlButton
-        { buttonModifiers
-            | color =
-                if flag then
-                    Info
-                else
-                    Light
-            , iconLeft = Just ( Medium, [], i [ class <| ruleIcon rule ] [] )
-        }
-        []
-        [ onClick <| CheckRule rule ]
-        [ span [] [ text <| toString rule ]
+    levelItem []
+        [ controlButton
+            { buttonModifiers
+                | color =
+                    if flag then
+                        Info
+                    else
+                        Light
+                , iconLeft = Just ( Medium, [], i [ class <| ruleIcon rule ] [] )
+            }
+            [ class "rule-checkbox" ]
+            [ onClick <| CheckRule rule
+            , fullWidth
+            ]
+            [ span [] [ text <| toString rule ]
+            ]
         ]

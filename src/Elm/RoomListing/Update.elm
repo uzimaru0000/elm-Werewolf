@@ -1,6 +1,8 @@
 module RoomListing.Update exposing (..)
 
 import RoomListing.Model exposing (..)
+import Navigation
+import Routing
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -28,3 +30,6 @@ update msg model =
                         rule :: model.checkedRules
             in
                 { model | checkedRules = newList } ! []
+
+        MoveRoom uid ->
+            model ! [ Navigation.newUrl <| Routing.routeToUrl <| Routing.Room uid ]

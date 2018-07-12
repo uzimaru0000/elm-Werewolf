@@ -6,6 +6,7 @@ import Routing exposing (Route)
 import Auth.View as Auth exposing (..)
 import RoomCreate.View as RoomCreate
 import RoomListing.View as RoomListing
+import Room.View as Room
 import Home.View as Home
 import Html exposing (Html, div, text, span, img, p, a)
 import Html.Attributes exposing (class, classList, style, src, href, target)
@@ -34,6 +35,7 @@ frame user currentPage isLoading isActive =
         [ loading isLoading
         , navigation isActive user
         , page user currentPage
+        , myFooter
         ]
 
 
@@ -112,7 +114,6 @@ page user page =
             div []
                 [ header page
                 , RoomListing.view model |> Html.map RoomListingMsg
-                , myFooter
                 ]
 
         RoomCreate model ->
@@ -129,7 +130,11 @@ page user page =
         Home ->
             div []
                 [ Home.view
-                , myFooter
+                ]
+
+        RoomView model ->
+            div []
+                [ Room.view model
                 ]
 
         _ ->

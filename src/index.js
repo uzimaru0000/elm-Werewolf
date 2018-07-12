@@ -85,6 +85,21 @@ const elmInit = app => {
         db.ref('room').once('value').then(ss => sendRoomList(ss, app.ports.getRoomListDate));
     });
 
+    // roomViewInit
+    app.ports.roomViewInit.subscribe(uid => {
+        db.ref(`room/${uid}`).once('value').then(ss => {
+            const room = ss.val();
+            room.uid = uid;
+            db.ref(`users/${room.ownerID}`).once('value')
+                .then(x => {
+                    const user = x.val();
+                    user.uid = x.key;
+                    room.owner = user;
+                    app.ports.getRoomViewData.send(room);
+                })
+        });
+    });
+
     // create room
     app.ports.createRoom.subscribe(model => {
         const newRoom = {
@@ -98,7 +113,7 @@ const elmInit = app => {
 
         db.ref('room')
             .push(newRoom)
-            .then(_ => app.ports.createRoomSuccess.send(null));
+            .then(x => app.ports.createRoomSuccess.send(x.key));
     });
 
     // getList request

@@ -15,6 +15,7 @@ type Msg
     = GetList (List Room)
     | InputRoomName String
     | CheckRule Rule
+    | MoveRoom String
 
 
 init : List Room -> Model

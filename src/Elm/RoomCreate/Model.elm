@@ -28,7 +28,7 @@ type Msg
     | RuleActive Rule
     | InputRoleNum Rule String
     | Create
-    | Success ()
+    | Success String
 
 
 init : Model

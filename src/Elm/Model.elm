@@ -3,6 +3,7 @@ module Model exposing (..)
 import Auth.Model as Auth
 import RoomCreate.Model as RoomCreate
 import RoomListing.Model as RoomListing
+import Room.Model as Room
 import Routing exposing (..)
 import Navigation exposing (Location)
 import User exposing (User)
@@ -16,6 +17,7 @@ type Page
     | Home
     | RoomCreate RoomCreate.Model
     | RoomListing RoomListing.Model
+    | RoomView Room.Model
 
 
 type PageState
@@ -38,6 +40,7 @@ type Msg
     | RoomCreateMsg RoomCreate.Msg
     | RoomListingMsg RoomListing.Msg
     | RoomListingInit JD.Value
+    | RoomViewInit JD.Value
     | Logout
     | LogoutSuccess ()
     | MenuClick
@@ -69,6 +72,9 @@ pageToRoute page =
 
         RoomListing _ ->
             Routing.RoomListing
+
+        RoomView { room } ->
+            Routing.Room room.name
 
         _ ->
             Routing.NotFound

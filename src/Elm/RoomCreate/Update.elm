@@ -82,8 +82,8 @@ update msg model =
                         |> createRoom
                   ]
 
-        Success _ ->
-            model ! [ Navigation.newUrl <| routeToUrl RoomListing ]
+        Success uid ->
+            model ! [ Navigation.newUrl <| routeToUrl <| Room uid ]
 
 
 errorCheck : Model -> Errors

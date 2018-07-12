@@ -8,6 +8,7 @@ type Route
     = RoomListing
     | RoomCreate
     | Login
+    | Room String
     | NotFound
 
 
@@ -17,6 +18,7 @@ matchers =
         [ map RoomListing top
         , map RoomCreate (s "create")
         , map Login (s "login")
+        , map Room (s "room" </> string)
         ]
 
 
@@ -40,6 +42,9 @@ routeToUrl route =
 
         Login ->
             "#login"
+
+        Room uid ->
+            String.join "/" ["#room", uid]
 
         NotFound ->
             "#notfound"

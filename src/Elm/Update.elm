@@ -12,6 +12,7 @@ import RoomListing.Model as RoomListing
 import RoomListing.Update as RoomListing
 import RoomCreate.Model as RoomCreate
 import RoomCreate.Update as RoomCreate
+import Room.Model as Room
 
 
 setRoute : Route -> Model -> ( Model, Cmd Msg )
@@ -38,6 +39,8 @@ setRoute route model =
             Routing.Login ->
                 { model | pageState = Loaded Login } ! []
 
+            Routing.Room uid ->
+                transition <| roomViewInit uid
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -62,6 +65,20 @@ updatePage page msg model =
                         |> Result.withDefault []
             in
                 { model | pageState = Loaded (RoomListing <| RoomListing.init list) } ! []
+
+        ( RoomViewInit initData, _ ) ->
+            let
+                maybeRoom =
+                    initData
+                        |> Json.decodeValue roomDecoder
+                        |> Result.toMaybe
+            in
+                case maybeRoom of
+                    Just room ->
+                        { model | pageState = Loaded (RoomView <| Room.init room) } ! []
+                    Nothing ->
+                        model ! [ Navigation.newUrl <| routeToUrl Routing.RoomListing ]
+                
 
         ( RoomListingMsg subMsg, RoomListing oldModel ) ->
             let
