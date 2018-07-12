@@ -6,7 +6,7 @@ import RoomListing.Model as RoomListing
 import Routing exposing (..)
 import Navigation exposing (Location)
 import User exposing (User)
-import Firebase exposing (..)
+import Json.Decode as JD
 
 
 type Page
@@ -37,7 +37,7 @@ type Msg
     | AuthMsg Auth.Msg
     | RoomCreateMsg RoomCreate.Msg
     | RoomListingMsg RoomListing.Msg
-    | RoomListingInit RoomListInitDate
+    | RoomListingInit JD.Value
     | Logout
     | LogoutSuccess ()
     | MenuClick

@@ -8,7 +8,6 @@ import RoomListing.Model exposing (..)
 import Html exposing (Html, text, img, i, span)
 import Html.Attributes exposing (class, style, src)
 import Html.Events exposing (..)
-
 import Bulma.Layout exposing (..)
 import Bulma.Elements exposing (..)
 import Bulma.Form exposing (..)
@@ -21,7 +20,7 @@ view model =
     section NotSpaced
         []
         [ container []
-            [forms model
+            [ forms model
             , listView model
             ]
         ]
@@ -56,57 +55,58 @@ forms model =
 
 
 listView : Model -> Html Msg
-listView { roomList, userDict } =
+listView { roomList } =
     roomList
-        |> List.map (listItem userDict)
+        |> List.map (listItem)
         |> content Standard []
 
 
-listItem : Dict String User -> Room -> Html Msg
-listItem dict room =
-    let
-        ownerData =
-            Dict.get room.ownerID dict
-    in
-        box
-            [ style [ ( "padding", "16px 32px" ) ] ]
-            [ media []
-                [ mediaLeft []
-                    [ image (OneByOne X64) []
-                        [ img
-                            [ ownerData
-                                |> Maybe.andThen .iconUrl
-                                |> Maybe.withDefault "https://bulma.io/images/placeholders/128x128.png"
-                                |> src
-                            ]
-                            []
+listItem : Room -> Html Msg
+listItem room =
+    box
+        [ style [ ( "padding", "16px 32px" ) ] ]
+        [ media []
+            [ mediaLeft []
+                [ image (OneByOne X64)
+                    []
+                    [ img
+                        [ room.owner.iconUrl
+                            |> Maybe.withDefault "https://bulma.io/images/placeholders/128x128.png"
+                            |> src
                         ]
+                        []
                     ]
-                , mediaContent []
-                    [ title H4 [] [ text room.name ]
-                    , room.ruleSet
-                        |> List.filter (\( _, n ) -> n > 0)
-                        |> List.map (Tuple.first >> ruleTag)
-                        |> tags []
-                    , level []
-                        [ List.range 0 room.maxNum
-                            |> List.map ((<=) <| List.length room.member)
-                            |> List.map
-                                (\x ->
-                                    icon Small
-                                        [ if x then Typo.textColor Typo.Grey else Typo.textColor Typo.Black ]
-                                        [ i [ class "fas fa-user" ] [] ]
-                                )
-                            |> levelLeft []
-                        ]
+                ]
+            , mediaContent []
+                [ title H4 [] [ text room.name ]
+                , room.ruleSet
+                    |> List.filter (\( _, n ) -> n > 0)
+                    |> List.map (Tuple.first >> ruleTag)
+                    |> tags []
+                , level []
+                    [ List.range 0 room.maxNum
+                        |> List.map ((<=) <| List.length room.member)
+                        |> List.map
+                            (\x ->
+                                icon Small
+                                    [ if x then
+                                        Typo.textColor Typo.Grey
+                                      else
+                                        Typo.textColor Typo.Black
+                                    ]
+                                    [ i [ class "fas fa-user" ] [] ]
+                            )
+                        |> levelLeft []
                     ]
                 ]
             ]
+        ]
 
 
 ruleTag : Rule -> Html Msg
 ruleTag rule =
-    tag { tagModifiers | color = Info } []
+    tag { tagModifiers | color = Info }
+        []
         [ icon Standard [] [ i [ class <| ruleIcon rule ] [] ]
         , span [] [ text <| toString rule ]
         ]
@@ -116,7 +116,11 @@ ruleCheckBox : ( Rule, Bool ) -> Html Msg
 ruleCheckBox ( rule, flag ) =
     controlButton
         { buttonModifiers
-            | color = if flag then Info else Light
+            | color =
+                if flag then
+                    Info
+                else
+                    Light
             , iconLeft = Just ( Medium, [], i [ class <| ruleIcon rule ] [] )
         }
         []

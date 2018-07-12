@@ -57,15 +57,11 @@ updatePage page msg model =
         ( RoomListingInit initData, _ ) ->
             let
                 list =
-                    initData.listValue
+                    initData
                         |> Json.decodeValue (Json.list roomDecoder)
                         |> Result.withDefault []
-
-                users =
-                    initData.userList
-                        |> List.foldl (\x acc -> Dict.insert x.uid x acc) Dict.empty
             in
-                { model | pageState = Loaded (RoomListing <| RoomListing.init list users) } ! []
+                { model | pageState = Loaded (RoomListing <| RoomListing.init list) } ! []
 
         ( RoomListingMsg subMsg, RoomListing oldModel ) ->
             let

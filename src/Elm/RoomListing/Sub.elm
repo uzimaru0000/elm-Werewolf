@@ -15,6 +15,5 @@ subscriptions model =
         |> GetList
       )
         |> getRoomList
-    , getUsers GetUserList
     ]
         |> Sub.batch

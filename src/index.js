@@ -58,7 +58,7 @@ const newRoom = ss => {
         ownerID: ss.val().ownerID,
         member: ss.val().member,
         maxNum: ss.val().maxNum,
-        pass: ss.val().pass || null,
+        pass: ss.val().pass,
         ruleSet: ss.val().ruleSet
     };
 };
@@ -69,8 +69,7 @@ const elmInit = app => {
     // login request
     app.ports.login.subscribe(type => {
         if (!auth.currentUser) {
-            // auth.signInWithRedirect(providers[type]);
-            auth.signInWithPopup(providers[type]);
+            auth.signInWithRedirect(providers[type]);
         }
     });
 
@@ -83,27 +82,7 @@ const elmInit = app => {
 
     // roomListingInit
     app.ports.roomListInit.subscribe(_ => {
-        db.ref('room').once('value').then(ss => {
-            const roomList = [];
-            ss.forEach(x => {
-                roomList.push(newRoom(x));
-            });
-            return roomList;
-        }).then(list => {
-            db.ref('users').once('value').then(ss => {
-                const userList = [];
-                ss.forEach(x => {
-                    const user = x.val();
-                    user.uid = x.key;
-                    userList.push(user);
-                });
-
-                app.ports.getRoomListDate.send({
-                    listValue: list,
-                    userList: userList
-                });
-            });
-        });
+        db.ref('room').once('value').then(ss => sendRoomList(ss, app.ports.getRoomListDate));
     });
 
     // create room
@@ -123,13 +102,30 @@ const elmInit = app => {
     });
 
     // getList request
-    const sendRoomList = ss => {
+    const sendRoomList = (ss, sender) => {
         const roomList = [];
         ss.forEach(x => {
             roomList.push(newRoom(x));
         });
-        app.ports.getRoomList.send(roomList);
+
+        Promise.all(roomList.map(x => db.ref(`users/${x.ownerID}`).once('value')))
+            .then(xs => {
+                const users = xs.reduce((acc, x) => {
+                    acc[x.key] = x.val();
+                    return acc;
+                }, {});
+
+                const rooms = roomList.map(x => {
+                    const owner = users[x.ownerID];
+                    owner.uid = x.ownerID;
+                    x.owner = owner;
+                    return x;
+                });
+
+                sender.send(rooms);
+            });
     }
 
-    db.ref('room').on('value', ss => sendRoomList(ss));
+    db.ref('room').on('value', ss => sendRoomList(ss, app.ports.getRoomList));
+
 };
