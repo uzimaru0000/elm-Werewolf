@@ -61,11 +61,33 @@ modelToValue model =
                     JE.null
     in
         JE.object
-            [ ( "roomName", model.roomName |> Maybe.withDefault "" |> JE.string  )
+            [ ( "roomName", model.roomName |> Maybe.withDefault "" |> JE.string )
             , ( "maxNum", JE.int model.maxNum )
             , ( "pass", helper JE.string model.pass )
             , ( "ruleSet", model.ruleSet |> List.map ruleSetEncoder |> JE.list )
             ]
+
+
+ruleMinNum : Rule -> Int
+ruleMinNum rule =
+    case rule of
+        Villager ->
+            1
+
+        Werewolf ->
+            2
+
+        Seer ->
+            1
+
+        Hunter ->
+            1
+
+        Madman ->
+            1
+
+        Psychic ->
+            1
 
 
 allGreen : Model -> Bool
@@ -74,12 +96,22 @@ allGreen model =
     , model.errors.passMissing
     , model.errors.memberMissing
     , case model.roomName of
-        Just "" -> True
-        Nothing -> True
-        _ -> False
+        Just "" ->
+            True
+
+        Nothing ->
+            True
+
+        _ ->
+            False
     , case model.pass of
-        Just "" -> True
-        Nothing -> True
-        _ -> False
+        Just "" ->
+            True
+
+        Nothing ->
+            True
+
+        _ ->
+            False
     ]
-    |> List.any identity
+        |> List.any identity

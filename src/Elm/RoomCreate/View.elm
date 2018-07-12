@@ -93,20 +93,23 @@ view model =
                   else
                     text ""
                 ]
-            , fields Right
+            , field
                 []
                 [ controlButton
                     { buttonModifiers
                         | color = Link
                         , static = allGreen model
+                        , size = Medium
                         , state =
                             model.isSuccess
                                 |> Maybe.map (\_ -> identity Loading)
                                 |> Maybe.withDefault Blur
                     }
                     []
-                    [ onClick Create ]
-                    [ text "Create" ]
+                    [ onClick Create
+                    , fullWidth
+                    ]
+                    [ span [] [ text "Create" ] ]
                 ]
             ]
         ]
@@ -119,7 +122,7 @@ ruleForm ( rule, n ) =
         [ controlButton
             { buttonModifiers
                 | color =
-                    if n > 0 then
+                    if n >= ruleMinNum rule then
                         Info
                     else
                         Light
@@ -130,7 +133,7 @@ ruleForm ( rule, n ) =
             , onClick <| RuleActive rule
             ]
             [ span [] [ text <| toString rule ] ]
-        , if n > 0 then
+        , if n >= ruleMinNum rule then
             controlInput controlInputModifiers
                 []
                 [ type_ "number"

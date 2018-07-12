@@ -2,7 +2,6 @@ module RoomCreate.Update exposing (..)
 
 import RoomCreate.Model exposing (..)
 import Firebase exposing (..)
-import Rule exposing (..)
 import Routing exposing (..)
 import Navigation exposing (..)
 
@@ -22,8 +21,11 @@ update msg model =
                 num =
                     String.toInt str
                         |> Result.withDefault 5
+                
+                newModel =
+                    { model | maxNum = num }
             in
-                { model | maxNum = num } ! []
+                { newModel | errors = errorCheck newModel } ! []
 
         InputPass str ->
             let
@@ -36,7 +38,7 @@ update msg model =
             let
                 helper t ( r, n ) =
                     if r == t then
-                        if n == 0 then
+                        if n < ruleMinNum r then
                             ( r, ruleMinNum r )
                         else
                             ( r, 0 )
@@ -82,28 +84,6 @@ update msg model =
 
         Success _ ->
             model ! [ Navigation.newUrl <| routeToUrl RoomListing ]
-
-
-ruleMinNum : Rule -> Int
-ruleMinNum rule =
-    case rule of
-        Villager ->
-            1
-
-        Werewolf ->
-            2
-
-        Seer ->
-            1
-
-        Hunter ->
-            1
-
-        Madman ->
-            1
-
-        Psychic ->
-            1
 
 
 errorCheck : Model -> Errors
