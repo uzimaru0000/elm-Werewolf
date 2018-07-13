@@ -170,13 +170,7 @@ navigationEnd maybeUser =
             navbarEnd []
                 [ navbarItemLink False
                     []
-                    [ image (OneByOne X24)
-                        []
-                        [ img
-                            [ user.iconUrl |> Maybe.withDefault "" |> src ]
-                            []
-                        ]
-                    , span [] [ text user.name ]
+                    [ userView Standard user
                     ]
                 , navbarItemLink False
                     [ onClick Logout

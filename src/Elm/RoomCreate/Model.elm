@@ -63,7 +63,7 @@ modelToValue model =
         JE.object
             [ ( "roomName", model.roomName |> Maybe.withDefault "" |> JE.string )
             , ( "maxNum", JE.int model.maxNum )
-            , ( "pass", helper JE.string model.pass )
+            , ( "pass", model.pass |> Maybe.withDefault "" |> JE.string )
             , ( "ruleSet", model.ruleSet |> List.map ruleSetEncoder |> JE.list )
             ]
 

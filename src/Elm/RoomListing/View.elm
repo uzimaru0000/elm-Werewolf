@@ -1,11 +1,7 @@
 module RoomListing.View exposing (..)
 
-import Dict exposing (..)
 import Room exposing (..)
 import Rule exposing (..)
-import User exposing (..)
-import Routing
-import Model
 import RoomListing.Model exposing (..)
 import Html exposing (Html, text, img, i, span)
 import Html.Attributes exposing (class, style, src, href)
@@ -85,7 +81,7 @@ listItem room =
                 [ title H4 [] [ text room.name ]
                 , room.ruleSet
                     |> List.filter (\( _, n ) -> n > 0)
-                    |> List.map (Tuple.first >> ruleTag)
+                    |> List.map (Tuple.first >> ruleTag Standard)
                     |> tags []
                 , level []
                     [ List.range 0 room.maxNum
@@ -107,15 +103,6 @@ listItem room =
         ]
 
 
-ruleTag : Rule -> Html Msg
-ruleTag rule =
-    tag { tagModifiers | color = Info }
-        []
-        [ icon Standard [] [ i [ class <| ruleIcon rule ] [] ]
-        , span [] [ text <| toString rule ]
-        ]
-
-
 ruleCheckBox : ( Rule, Bool ) -> Html Msg
 ruleCheckBox ( rule, flag ) =
     levelItem []
@@ -128,7 +115,7 @@ ruleCheckBox ( rule, flag ) =
                         Light
                 , iconLeft = Just ( Medium, [], i [ class <| ruleIcon rule ] [] )
             }
-            [ class "rule-checkbox" ]
+            [ class "is-mobile-fullWidth" ]
             [ onClick <| CheckRule rule
             , fullWidth
             ]

@@ -8,7 +8,7 @@ type alias Room =
     { uid : String
     , name : String
     , owner : User
-    , member : List String
+    , member : List User
     , maxNum : Int
     , pass : String
     , ruleSet : List RuleSet
@@ -21,7 +21,7 @@ roomDecoder =
         (JD.field "uid" JD.string)
         (JD.field "name" JD.string)
         (JD.field "owner" userDecoder)
-        (JD.field "member" <| JD.list JD.string)
+        (JD.field "member" <| JD.list userDecoder)
         (JD.field "maxNum" JD.int)
         (JD.field "pass" JD.string)
         (JD.field "ruleSet" <| JD.list ruleSetDecoder)

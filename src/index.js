@@ -90,11 +90,19 @@ const elmInit = app => {
         db.ref(`room/${uid}`).once('value').then(ss => {
             const room = ss.val();
             room.uid = uid;
-            db.ref(`users/${room.ownerID}`).once('value')
-                .then(x => {
-                    const user = x.val();
-                    user.uid = x.key;
-                    room.owner = user;
+
+            const requireUserList = [...room.member].filter((x, i, arr) => arr.indexOf(x) === i);
+
+            Promise.all(requireUserList.map(x => db.ref(`users/${x}`).once('value')))
+                .then(xs => {
+                    const users = xs.reduce((acc, x) => {
+                        acc[x.key] = x.val();
+                        acc[x.key].uid = x.key;
+                        return acc;
+                    }, {});
+
+                    room.owner = users[room.ownerID];
+                    room.member = room.member.map(x => users[x]);
                     app.ports.getRoomViewData.send(room);
                 })
         });
@@ -123,17 +131,20 @@ const elmInit = app => {
             roomList.push(newRoom(x));
         });
 
-        Promise.all(roomList.map(x => db.ref(`users/${x.ownerID}`).once('value')))
+        const requireUserList = roomList.reduce((acc, x) => [...acc, ...x.member], [])
+                                        .filter((x, i, arr) => arr.indexOf(x) === i);
+
+        Promise.all(requireUserList.map(x => db.ref(`users/${x}`).once('value')))
             .then(xs => {
                 const users = xs.reduce((acc, x) => {
                     acc[x.key] = x.val();
+                    acc[x.key].uid = x.key;
                     return acc;
                 }, {});
 
                 const rooms = roomList.map(x => {
-                    const owner = users[x.ownerID];
-                    owner.uid = x.ownerID;
-                    x.owner = owner;
+                    x.owner = users[x.ownerID];
+                    x.member = x.member.map(x => users[x]);
                     return x;
                 });
 

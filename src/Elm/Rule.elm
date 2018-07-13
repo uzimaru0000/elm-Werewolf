@@ -4,6 +4,11 @@ import Json.Decode as JD
 import Json.Encode as JE
 import Tuple
 
+import Html exposing (Html, text, i, span)
+import Html.Attributes exposing (class, style)
+import Bulma.Elements exposing (tag, tagModifiers, icon)
+import Bulma.Modifiers exposing (..)
+
 
 type Rule
     = Villager
@@ -38,6 +43,18 @@ ruleIcon rule =
 
         Psychic ->
             "fas fa-star"
+
+
+ruleTag : Size -> Rule -> Html msg
+ruleTag size rule =
+    tag { tagModifiers
+            | color = Info
+            , size = size
+        }
+        []
+        [ icon Standard [] [ i [ class <| ruleIcon rule ] [] ]
+        , span [] [ text <| toString rule ]
+        ]
 
 
 stringToRule : String -> Maybe Rule
