@@ -2,6 +2,7 @@ module RoomCreate.Model exposing (..)
 
 import Rule exposing (..)
 import Json.Encode as JE
+import Json.Decode as JD
 
 
 type alias Errors =
@@ -28,7 +29,7 @@ type Msg
     | RuleActive Rule
     | InputRoleNum Rule String
     | Create
-    | Success String
+    | Success JD.Value
 
 
 init : Model
@@ -51,21 +52,12 @@ init =
 
 modelToValue : Model -> JE.Value
 modelToValue model =
-    let
-        helper encoder a =
-            case a of
-                Just x ->
-                    encoder x
-
-                Nothing ->
-                    JE.null
-    in
-        JE.object
-            [ ( "roomName", model.roomName |> Maybe.withDefault "" |> JE.string )
-            , ( "maxNum", JE.int model.maxNum )
-            , ( "pass", model.pass |> Maybe.withDefault "" |> JE.string )
-            , ( "ruleSet", model.ruleSet |> List.map ruleSetEncoder |> JE.list )
-            ]
+    JE.object
+        [ ( "roomName", model.roomName |> Maybe.withDefault "" |> JE.string )
+        , ( "maxNum", JE.int model.maxNum )
+        , ( "pass", model.pass |> Maybe.withDefault "" |> JE.string )
+        , ( "ruleSet", model.ruleSet |> List.map ruleSetEncoder |> JE.list )
+        ]
 
 
 ruleMinNum : Rule -> Int

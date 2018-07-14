@@ -56,7 +56,7 @@ const newRoom = ss => {
         uid: ss.key,
         name: ss.val().name,
         ownerID: ss.val().ownerID,
-        member: ss.val().member,
+        member: ss.val().member || [],
         maxNum: ss.val().maxNum,
         pass: ss.val().pass,
         ruleSet: ss.val().ruleSet
@@ -90,30 +90,43 @@ const elmInit = app => {
         db.ref(`room/${uid}`).once('value').then(ss => {
             const room = ss.val();
             room.uid = uid;
+            room.member = room.member || [];
 
-            const requireUserList = [...room.member].filter((x, i, arr) => arr.indexOf(x) === i);
+            db.ref(`room/${uid}`).on('value', ss => {
+                const room = ss.val();
+                room.uid = uid;
+                sendOneRoom(room, app.ports.getRoom);
+            });
 
-            Promise.all(requireUserList.map(x => db.ref(`users/${x}`).once('value')))
-                .then(xs => {
-                    const users = xs.reduce((acc, x) => {
-                        acc[x.key] = x.val();
-                        acc[x.key].uid = x.key;
-                        return acc;
-                    }, {});
-
-                    room.owner = users[room.ownerID];
-                    room.member = room.member.map(x => users[x]);
-                    app.ports.getRoomViewData.send(room);
-                })
-        });
+            sendOneRoom(room, app.ports.getRoomViewData);
+        })
+        .catch(_ => app.ports.getRoomViewData.send(null));
     });
+
+    // send one room
+    const sendOneRoom = (room, sender) => {
+        room.member = room.member || [];
+        const requireUserList = [room.ownerID, ...room.member];
+
+        Promise.all(requireUserList.map(x => db.ref(`users/${x}`).once('value')))
+            .then(xs => {
+                const users = xs.reduce((acc, x) => {
+                    acc[x.key] = x.val();
+                    acc[x.key].uid = x.key;
+                    return acc;
+                }, {});
+                room.owner = users[room.ownerID];
+                room.member = room.member.map(x => users[x]);
+                sender.send(room);
+            });
+    };
 
     // create room
     app.ports.createRoom.subscribe(model => {
         const newRoom = {
             name: model.roomName,
             ownerID: auth.currentUser.uid,
-            member: [auth.currentUser.uid],
+            member: [],
             maxNum: model.maxNum,
             pass: model.pass,
             ruleSet: model.ruleSet
@@ -121,7 +134,10 @@ const elmInit = app => {
 
         db.ref('room')
             .push(newRoom)
-            .then(x => app.ports.createRoomSuccess.send(x.key));
+            .then(x => {
+                newRoom.uid = x.key;
+                sendOneRoom(newRoom, app.ports.createRoomSuccess);
+            });
     });
 
     // getList request
@@ -131,8 +147,8 @@ const elmInit = app => {
             roomList.push(newRoom(x));
         });
 
-        const requireUserList = roomList.reduce((acc, x) => [...acc, ...x.member], [])
-                                        .filter((x, i, arr) => arr.indexOf(x) === i);
+        const requireUserList = roomList.reduce((acc, x) => [...acc, x.ownerID,...x.member], [])
+            .filter((x, i, arr) => arr.indexOf(x) === i);
 
         Promise.all(requireUserList.map(x => db.ref(`users/${x}`).once('value')))
             .then(xs => {
@@ -152,6 +168,23 @@ const elmInit = app => {
             });
     }
 
+    // join room
+    app.ports.joinRoom.subscribe(room => {
+        const uid = room.uid;
+        room.uid = null;
+        room.member.push(auth.currentUser.uid);
+        db.ref(`room/${uid}`).update(room);
+    });
+
+    // exit room
+    app.ports.exitRoom.subscribe(room => {
+        const uid = room.uid;
+        room.uid = null;
+        room.member = room.member.filter(x => x !== auth.currentUser.uid);
+        db.ref(`room/${uid}`).update(room);
+    });
+
+    // db update
     db.ref('room').on('value', ss => sendRoomList(ss, app.ports.getRoomList));
 
 };

@@ -39,6 +39,7 @@ type Msg
     | AuthMsg Auth.Msg
     | RoomCreateMsg RoomCreate.Msg
     | RoomListingMsg RoomListing.Msg
+    | RoomMsg Room.Msg
     | RoomListingInit JD.Value
     | RoomViewInit JD.Value
     | Logout

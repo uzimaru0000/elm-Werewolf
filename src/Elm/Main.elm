@@ -6,6 +6,7 @@ import View exposing (..)
 import Update exposing (..)
 import RoomCreate.Sub as RoomCreate exposing (..)
 import RoomListing.Sub as RoomListing exposing (..)
+import Room.Sub as Room exposing (..)
 import Firebase exposing (..)
 import Navigation exposing (Location)
 import Routing exposing (Route)
@@ -25,6 +26,9 @@ pageSubscriptions page =
 
         RoomCreate model ->
             RoomCreate.subscriptions model |> Sub.map RoomCreateMsg
+
+        RoomView model ->
+            Room.subscriptions model |> Sub.map RoomMsg
 
         _ ->
             Sub.none

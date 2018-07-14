@@ -2,8 +2,10 @@ module RoomCreate.Update exposing (..)
 
 import RoomCreate.Model exposing (..)
 import Firebase exposing (..)
-import Routing exposing (..)
+import Routing
 import Navigation exposing (..)
+import Room exposing (..)
+import Json.Decode as JD
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -21,7 +23,7 @@ update msg model =
                 num =
                     String.toInt str
                         |> Result.withDefault 5
-                
+
                 newModel =
                     { model | maxNum = num }
             in
@@ -82,8 +84,21 @@ update msg model =
                         |> createRoom
                   ]
 
-        Success uid ->
-            model ! [ Navigation.newUrl <| routeToUrl <| Room uid ]
+        Success value ->
+            let
+                maybeRoom =
+                    JD.decodeValue roomDecoder value
+                        |> Result.toMaybe
+            in
+                case maybeRoom of
+                    Just room ->
+                        model
+                            ! [ Navigation.newUrl <| Routing.routeToUrl <| Routing.Room room.uid
+                              , joinRoom <| roomEncoder room
+                              ]
+
+                    Nothing ->
+                        { model | isSuccess = Nothing } ! []
 
 
 errorCheck : Model -> Errors

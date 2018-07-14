@@ -4,7 +4,6 @@ import Model exposing (..)
 import Routing exposing (Route, parseLocation, routeToUrl)
 import Navigation
 import Json.Decode as Json
-import Dict
 import Room exposing (..)
 import Firebase exposing (..)
 import Auth.Cmd as Auth
@@ -13,6 +12,7 @@ import RoomListing.Update as RoomListing
 import RoomCreate.Model as RoomCreate
 import RoomCreate.Update as RoomCreate
 import Room.Model as Room
+import Room.Update as Room
 
 
 setRoute : Route -> Model -> ( Model, Cmd Msg )
@@ -51,6 +51,13 @@ update msg model =
 updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
 updatePage page msg model =
     case ( msg, page ) of
+        ( LocationChange loc, RoomView subModel ) ->
+            let
+                ( newModel, cmd ) =
+                    setRoute (parseLocation loc) model
+            in
+                newModel ! [ cmd, exitRoom <| roomEncoder subModel.room ]
+
         ( LocationChange loc, _ ) ->
             setRoute (parseLocation loc) model
 
@@ -73,12 +80,15 @@ updatePage page msg model =
                         |> Json.decodeValue roomDecoder
                         |> Result.toMaybe
             in
-                case maybeRoom of
-                    Just room ->
-                        { model | pageState = Loaded (RoomView <| Room.init room) } ! []
-                    Nothing ->
-                        model ! [ Navigation.newUrl <| routeToUrl Routing.RoomListing ]
-                
+                case ( maybeRoom, model.user ) of
+                    ( Just room, Just user ) ->
+                        { model | pageState = Loaded (RoomView <| Room.init room user) } ! []
+
+                    ( Nothing, _ ) ->
+                        { model | pageState = Loaded NotFound } ! []
+
+                    _ ->
+                        model ! [ Navigation.newUrl <| Routing.routeToUrl Routing.RoomListing ]
 
         ( RoomListingMsg subMsg, RoomListing oldModel ) ->
             let
@@ -93,6 +103,13 @@ updatePage page msg model =
                     RoomCreate.update subMsg oldModel
             in
                 { model | pageState = Loaded (RoomCreate subModel) } ! [ Cmd.map RoomCreateMsg subCmd ]
+
+        ( RoomMsg subMsg, RoomView oldModel ) ->
+            let
+                ( subModel, subCmd ) =
+                    Room.update subMsg oldModel
+            in
+                { model | pageState = Loaded (RoomView subModel) } ! [ Cmd.map RoomMsg subCmd ]
 
         ( AuthMsg msg, _ ) ->
             ( model, Auth.cmd msg )

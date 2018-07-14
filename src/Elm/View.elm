@@ -134,11 +134,12 @@ page user page =
 
         RoomView model ->
             div []
-                [ Room.view model
+                [ Room.view model |> Html.map RoomMsg
                 ]
 
         _ ->
-            text "not found"
+            div []
+                [ header page ]
 
 
 navigation : Bool -> Maybe User -> Html Msg
