@@ -29,3 +29,16 @@ update msg ({ room, user } as model) =
 
                     Nothing ->
                         model ! []
+
+        ModalOff ->
+            model ! [ Navigation.newUrl <| Routing.routeToUrl Routing.RoomListing ]
+
+        InputPass str ->
+            { model | input = str } ! []
+
+        Join _ ->
+            let
+                isSuccess =
+                    room.pass == model.input
+            in
+                { model | isAuth = isSuccess, passwordError = not isSuccess } ! []

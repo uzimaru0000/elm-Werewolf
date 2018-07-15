@@ -4,6 +4,7 @@ import Html exposing (Html, text, span, div, a, img, i)
 import Html.Attributes exposing (class, style, value)
 import Html.Events exposing (onClick, onInput)
 import Room.Model exposing (..)
+import Room exposing (passModal)
 import Rule exposing (..)
 import User exposing (..)
 import Bulma.Columns exposing (..)
@@ -21,6 +22,10 @@ view model =
         , section NotSpaced
             []
             [ mainContent model ]
+        , if not model.isAuth then
+            passModal model.room model ModalOff InputPass Join
+          else
+            text ""
         ]
 
 
