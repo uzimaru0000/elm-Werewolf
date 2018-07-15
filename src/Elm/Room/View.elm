@@ -9,7 +9,6 @@ import User exposing (..)
 import Bulma.Columns exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Elements exposing (..)
-import Bulma.Components exposing (..)
 import Bulma.Modifiers exposing (..)
 import Bulma.Modifiers.Typography as Typo
 import Bulma.Form exposing (..)
@@ -22,7 +21,6 @@ view model =
         , section NotSpaced
             []
             [ mainContent model ]
-        , passModal model
         ]
 
 
@@ -74,7 +72,7 @@ mainContent ({ room, user } as model) =
             ]
         , content Standard
             []
-            [ entryBtn model ]
+            [ exitBtn model ]
         ]
 
 
@@ -100,18 +98,8 @@ ruleView ( rule, n ) =
         ]
 
 
-entryBtn : Model -> Html Msg
-entryBtn { room, user } =
-    let
-        isJoin =
-            List.member user room.member
-
-        (msg, btnStr) =
-            if isJoin then
-                (Exit, "Exit")
-            else
-                (ModalStateChange True, "Join")
-    in
+exitBtn : Model -> Html Msg
+exitBtn { room, user } =
     field
         []
         [ controlButton
@@ -121,57 +109,10 @@ entryBtn { room, user } =
             }
             []
             [ fullWidth
-            , onClick msg
+            , onClick Exit
             ]
             [ span []
-                [ text btnStr
-                ]
-            ]
-        ]
-
-passModal : Model -> Html Msg
-passModal { isActive, passwordError, input } =
-    modal isActive
-        []
-        [ modalBackground [ onClick <| ModalStateChange False ] []
-        , modalCard []
-            [ modalCardHead []
-                [ modalCardTitle [] [ text "部屋に参加する" ]
-                , delete [ onClick <| ModalStateChange False ] []
-                ]
-            , modalCardBody []
-                [ field []
-                    [ controlLabel [] [ text "パスワードを入力" ]
-                    , controlPassword 
-                        { controlInputModifiers
-                            | color =
-                                if passwordError then
-                                    Danger
-                                else
-                                    Default
-                            , iconLeft = Just ( Small, [], i [ class "fas fa-key" ] [] )
-                        }
-                        []
-                        [ value input
-                        , onInput PassWordInput ]
-                        []
-                    , if passwordError then
-                        controlHelp Danger [] [ text "パスワードが違います" ]
-                      else
-                        text ""
-                    ]
-                ]
-            , modalCardFoot []
-                [ fields Left []
-                    [ controlButton { buttonModifiers | color = Success }
-                        []
-                        [ onClick Join ]
-                        [ span [] [ text "Join" ] ]
-                    , controlButton buttonModifiers
-                        []
-                        [ onClick <| ModalStateChange False ]
-                        [ span [] [ text "Cancel" ] ]
-                    ]
+                [ text "Exit"
                 ]
             ]
         ]

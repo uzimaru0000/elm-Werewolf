@@ -3,6 +3,8 @@ module RoomListing.Update exposing (..)
 import RoomListing.Model exposing (..)
 import Navigation
 import Routing
+import Firebase exposing (..)
+import Room exposing (roomEncoder)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -11,25 +13,25 @@ update msg model =
         GetList list ->
             { model | roomList = list } ! []
 
-        InputRoomName str ->
-            { model
-                | serchRoomName =
-                    if String.isEmpty str then
-                        Nothing
+        Join uid ->
+            case model.selectedRoom of
+                Just room ->
+                    if model.input == room.pass then
+                        model
+                            ! [ Navigation.newUrl <| Routing.routeToUrl <| Routing.Room uid
+                              , joinRoom <| roomEncoder room
+                              ]
                     else
-                        Just str
-            }
-                ! []
+                        { model | passwordError = True } ! []
+                
+                Nothing ->
+                    model ! []
 
-        CheckRule rule ->
-            let
-                newList =
-                    if List.member rule model.checkedRules then
-                        List.filter ((/=) rule) model.checkedRules
-                    else
-                        rule :: model.checkedRules
-            in
-                { model | checkedRules = newList } ! []
+        SelectRoom room ->
+            { model | selectedRoom = Just room } ! []
 
-        MoveRoom uid ->
-            model ! [ Navigation.newUrl <| Routing.routeToUrl <| Routing.Room uid ]
+        InputPass str ->
+            { model | input = str } ! []
+        
+        ModalOff ->
+            { model | input = "", selectedRoom = Nothing, passwordError = False } ! []

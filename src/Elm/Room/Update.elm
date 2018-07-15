@@ -4,24 +4,18 @@ import Firebase exposing (..)
 import Room exposing (..)
 import Room.Model exposing (..)
 import Json.Decode as JD
+import Navigation
+import Routing
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ room, user } as model) =
     case msg of
-        Join ->
-            if model.input == room.pass then
-                { model
-                    | isActive = False
-                    , passwordError = False
-                    , input = ""
-                }
-                    ! [ joinRoom <| roomEncoder room ]
-            else
-                { model | passwordError = True } ! []
-
         Exit ->
-            model ! [ exitRoom <| roomEncoder room ]
+            model
+                ! [ exitRoom <| roomEncoder room
+                  , Navigation.newUrl <| Routing.routeToUrl Routing.RoomListing
+                  ]
 
         FetchRoomInfo value ->
             let
@@ -35,14 +29,3 @@ update msg ({ room, user } as model) =
 
                     Nothing ->
                         model ! []
-
-        PassWordInput str ->
-            { model | input = str } ! []
-
-        ModalStateChange flag ->
-            { model
-                | isActive = flag
-                , passwordError = False
-                , input = ""
-            }
-                ! []

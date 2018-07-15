@@ -1,26 +1,28 @@
 module RoomListing.Model exposing (..)
 
 import Room exposing (..)
-import Rule exposing (..)
 
 
 type alias Model =
     { roomList : List Room
-    , serchRoomName : Maybe String
-    , checkedRules : List Rule
+    , selectedRoom : Maybe Room
+    , input : String
+    , passwordError : Bool
     }
 
 
 type Msg
     = GetList (List Room)
-    | InputRoomName String
-    | CheckRule Rule
-    | MoveRoom String
+    | Join String
+    | SelectRoom Room
+    | InputPass String
+    | ModalOff
 
 
 init : List Room -> Model
 init roomList =
     { roomList = roomList
-    , serchRoomName = Nothing
-    , checkedRules = []
+    , selectedRoom = Nothing
+    , input = ""
+    , passwordError = False
     }

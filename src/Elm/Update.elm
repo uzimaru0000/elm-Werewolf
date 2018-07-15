@@ -82,7 +82,12 @@ updatePage page msg model =
             in
                 case ( maybeRoom, model.user ) of
                     ( Just room, Just user ) ->
-                        { model | pageState = Loaded (RoomView <| Room.init room user) } ! []
+                        { model | pageState = Loaded (RoomView <| Room.init room user) }
+                            ! [ if not <| List.member user room.member then
+                                    Navigation.newUrl <| Routing.routeToUrl Routing.RoomListing
+                                else
+                                    Cmd.none
+                              ]
 
                     ( Nothing, _ ) ->
                         { model | pageState = Loaded NotFound } ! []

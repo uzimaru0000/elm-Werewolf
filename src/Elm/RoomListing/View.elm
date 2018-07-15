@@ -4,10 +4,11 @@ import Room exposing (..)
 import Rule exposing (..)
 import RoomListing.Model exposing (..)
 import Html exposing (Html, text, img, i, span)
-import Html.Attributes exposing (class, style, src, href)
+import Html.Attributes exposing (class, style, src, href, value)
 import Html.Events exposing (..)
 import Bulma.Layout exposing (..)
 import Bulma.Elements exposing (..)
+import Bulma.Components exposing (..)
 import Bulma.Form exposing (..)
 import Bulma.Modifiers exposing (..)
 import Bulma.Modifiers.Typography as Typo
@@ -18,36 +19,13 @@ view model =
     section NotSpaced
         []
         [ container []
-            [ forms model
-            , listView model
-            ]
-        ]
+            [ listView model
+            , case model.selectedRoom of
+                Just room ->
+                    passModal room model
 
-
-forms : Model -> Html Msg
-forms model =
-    box
-        []
-        [ title H3 [] [ text "Filter" ]
-        , field
-            []
-            [ controlLabel [] [ text "RoomName" ]
-            , controlInput controlInputModifiers
-                []
-                [ onInput InputRoomName ]
-                []
-            ]
-        , field
-            []
-            [ controlLabel [] [ text "Rule" ]
-            , [ Seer
-              , Hunter
-              , Madman
-              , Psychic
-              ]
-                |> List.map (\x -> ( x, List.member x model.checkedRules ))
-                |> List.map ruleCheckBox
-                |> levelLeft []
+                Nothing ->
+                    text ""
             ]
         ]
 
@@ -62,7 +40,7 @@ listView { roomList } =
 listItem : Room -> Html Msg
 listItem room =
     box
-        [ onClick <| MoveRoom room.uid
+        [ onClick <| SelectRoom room
         , style [ ( "cursor", "pointer" ) ]
         ]
         [ media []
@@ -103,22 +81,51 @@ listItem room =
         ]
 
 
-ruleCheckBox : ( Rule, Bool ) -> Html Msg
-ruleCheckBox ( rule, flag ) =
-    levelItem []
-        [ controlButton
-            { buttonModifiers
-                | color =
-                    if flag then
-                        Info
-                    else
-                        Light
-                , iconLeft = Just ( Medium, [], i [ class <| ruleIcon rule ] [] )
-            }
-            [ class "is-mobile-fullWidth" ]
-            [ onClick <| CheckRule rule
-            , fullWidth
-            ]
-            [ span [] [ text <| toString rule ]
+passModal : Room -> Model -> Html Msg
+passModal room { passwordError, input } =
+    modal True
+        []
+        [ modalBackground [ onClick ModalOff ] []
+        , modalCard []
+            [ modalCardHead []
+                [ modalCardTitle [] [ text "部屋に参加する" ]
+                , delete [ onClick ModalOff ] []
+                ]
+            , modalCardBody []
+                [ field []
+                    [ controlLabel [] [ text "パスワードを入力" ]
+                    , controlPassword
+                        { controlInputModifiers
+                            | color =
+                                if passwordError then
+                                    Danger
+                                else
+                                    Default
+                            , iconLeft = Just ( Small, [], i [ class "fas fa-key" ] [] )
+                        }
+                        []
+                        [ value input
+                        , onInput InputPass
+                        ]
+                        []
+                    , if passwordError then
+                        controlHelp Danger [] [ text "パスワードが違います" ]
+                      else
+                        text ""
+                    ]
+                ]
+            , modalCardFoot []
+                [ fields Left
+                    []
+                    [ controlButton { buttonModifiers | color = Success }
+                        []
+                        [ onClick <| Join room.uid ]
+                        [ span [] [ text "Join" ] ]
+                    , controlButton buttonModifiers
+                        []
+                        [ onClick ModalOff ]
+                        [ span [] [ text "Cancel" ] ]
+                    ]
+                ]
             ]
         ]

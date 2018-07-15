@@ -181,7 +181,12 @@ const elmInit = app => {
         const uid = room.uid;
         room.uid = null;
         room.member = room.member.filter(x => x !== auth.currentUser.uid);
-        db.ref(`room/${uid}`).update(room);
+        if (room.member.length > 0) {
+            if (room.ownerID === auth.currentUser.uid) room.ownerID = room.member[0];
+            db.ref(`room/${uid}`).update(room);
+        } else {
+            db.ref(`room/${uid}`).remove();
+        }
     });
 
     // db update
